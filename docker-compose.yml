@@ -1,0 +1,6 @@
+services:
+  ruby:
+    build: .
+    volumes:
+      - .:/app
+    command: rspec
