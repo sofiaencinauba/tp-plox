@@ -36,8 +36,8 @@ class Scanner
 			add_token(type)
 		elsif (type = TokenType::SINGLE_CHAR_TOKENS[c])
 			add_token(type)
-		# elsif digit?(c)
-		# 	number
+		elsif digit?(c)
+			add_token(TokenType::NUMBER)
 		else
 			raise "Unexpected character: #{c}"
 		end
@@ -58,6 +58,11 @@ class Scanner
 		return previous
 	end
 
+	def digit?(c)
+		return true if c =~ /[0-9]/
+		false
+	end
+	
   def at_end?
     @current >= @source.length
   end

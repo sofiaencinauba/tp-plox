@@ -15,6 +15,11 @@ RSpec.describe Scanner do
     it 'devuelve un punto y coma para una fuente con punto y coma' do
       expect(Scanner.new(';').scan).to eq([{ type: :semicolon }])
     end
+		describe 'scan_digit' do
+			it 'devuelve un número para una fuente con un número' do
+				expect(Scanner.new('1').scan).to eq([{ type: :number }])
+			end
+		end
 		describe 'scan_double_token' do
 			it 'devuelve un signo de desigualdad para una fuente con signo de desigualdad' do
 				expect(Scanner.new('!=').scan).to eq([{ type: :bang_equal }])
