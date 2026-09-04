@@ -8,4 +8,4 @@ RUN bundle install
 
 COPY . .
 
-CMD ["irb"]
+CMD ["ruby", "hello.rb"]
