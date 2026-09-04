@@ -11,7 +11,13 @@ module TokenType
     PLUS = :plus
     MINUS = :minus
     EOF = :eof
+    BANG = :bang
 
+    # Token de dos caracteres
+    BANG_EQUAL = :bang_equal
+    EQUAL_EQUAL = :equal_equal
+    LESS_EQUAL = :less_equal
+    GREATER_EQUAL = :greater_equal
 
     # Literales
     IDENTIFIER = :identifier
@@ -28,13 +34,14 @@ module TokenType
     '-' => TokenType::MINUS,
     '+' => TokenType::PLUS,
     ';' => TokenType::SEMICOLON,
-    '*' => TokenType::STAR
+    '*' => TokenType::STAR,
+    '!' => TokenType::BANG
   }.freeze
 
     DOUBLE_CHAR_TOKENS = {
-    '!=' => :bang_equal,
-    '==' => :equal_equal,
-    '<=' => :less_equal,
-    '>=' => :greater_equal
+    '!=' => TokenType::BANG_EQUAL,
+    '==' => TokenType::EQUAL_EQUAL,
+    '<=' => TokenType::LESS_EQUAL,
+    '>=' => TokenType::GREATER_EQUAL
     }.freeze
 end
