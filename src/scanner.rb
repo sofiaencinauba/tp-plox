@@ -35,7 +35,7 @@ class Scanner
 
     if (c == '/')
       if peek == '/'
-        advance while !at_end?
+        advance while peek != "\n" && !at_end?      
       else
         add_token(TokenType::SLASH)
       end
