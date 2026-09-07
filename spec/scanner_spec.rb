@@ -48,6 +48,18 @@ RSpec.describe Scanner do
       end
     end
     
+    describe 'scan_identifier' do
+      it 'devuelve un identificador para una fuente con string no reservado' do
+        expect(Scanner.new('x').scan).to eq([{ type: :identifier, lexeme: 'x'}])
+      end
+      it 'devuelve un identificador para una fuente con string no reservado' do
+        expect(Scanner.new('xyz').scan).to eq([{ type: :identifier, lexeme: 'xyz'}])
+      end
+      it 'devuelve un identificador para una fuente con string no reservado' do
+        expect(Scanner.new('x_yz').scan).to eq([{ type: :identifier, lexeme: 'x_yz'}])
+      end
+    end
+
     describe 'scan_unexpected_character' do
       it 'lanza un error para una fuente con un caracter inesperado' do
         expect { Scanner.new('@').scan }.to raise_error(Scanner::Error, 'Unexpected character: @')

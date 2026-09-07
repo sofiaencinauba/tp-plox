@@ -53,6 +53,13 @@ class Scanner
 	  
 	  lexeme = @source[@start...@current]
       add_token(TokenType::NUMBER, lexeme)
+
+	elsif is_alpha?(c)
+	  @start = @current - 1
+	  advance while is_alpha?(peek) && !at_end?
+
+	  lexeme = @source[@start..@current]
+	  add_token(TokenType::IDENTIFIER, lexeme)
     else
       raise Error, "Unexpected character: #{c}"
     end
@@ -76,6 +83,10 @@ class Scanner
 
   def digit?(c)
     c.match?(/\d/)
+  end
+
+  def is_alpha?(c)
+    c.match(/[a-zA-Z_]/)
   end
 
   def at_end?
