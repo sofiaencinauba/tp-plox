@@ -58,8 +58,9 @@ class Scanner
       @start = @current - 1
       advance while alpha?(peek) && !at_end?
 
-      lexeme = @source[@start..@current]
-      add_token(TokenType::IDENTIFIER, lexeme)
+      lexeme = @source[@start...@current]
+      type = TokenType::TOKEN_KEYWORDS.fetch(lexeme.to_sym, TokenType::IDENTIFIER)
+      add_token(type, lexeme)
     else
       raise Error, "Unexpected character: #{c}"
     end
@@ -89,6 +90,8 @@ class Scanner
   def alpha?(c)
     c.match(/[a-zA-Z_]/)
   end
+
+  def keyword?(lexeme); end
 
   def at_end?
     @current >= @source.length

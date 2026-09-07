@@ -74,6 +74,20 @@ RSpec.describe Scanner do
       end
     end
 
+    describe 'scan_keywords' do
+      it 'devuelve una keyword para una fuente con un string keyword' do
+        expect(Scanner.new('and').scan).to contain_exactly(be_a(Token).and(have_attributes(token_type: :and,
+                                                                                           lexeme: 'and', literal: nil)))
+      end
+      it 'devuelve una keyword para una fuente con un string keyword' do
+        expect(Scanner.new('or').scan).to contain_exactly(be_a(Token).and(have_attributes(token_type: :or,
+                                                                                           lexeme: 'or', literal: nil)))
+      end
+      it 'no devuelve keyword para una fuente con un string keyword en mayuscula' do
+        expect(Scanner.new('AND').scan).to contain_exactly(be_a(Token).and(have_attributes(token_type: :identifier,
+                                                                                           lexeme: 'AND', literal: nil)))
+      end
+    end
     describe 'scan_unexpected_character' do
       it 'lanza un error para una fuente con un caracter inesperado' do
         expect { Scanner.new('@').scan }.to raise_error(Scanner::Error, 'Unexpected character: @')
