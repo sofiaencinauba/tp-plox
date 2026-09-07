@@ -1,4 +1,4 @@
-require_relative 'token'
+require_relative 'token.rb'
 
 class Scanner
   class Error < StandardError; end
@@ -65,8 +65,9 @@ class Scanner
     end
   end
 
-  def add_token(type, lexeme = nil)
-    @tokens << { type: type, lexeme: lexeme }
+  def add_token(type, lexeme = nil, literal=nil)
+    token = Token.new(type, lexeme, literal)
+    @tokens << token
   end
 
   def peek

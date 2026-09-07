@@ -86,6 +86,8 @@ module TokenType
 end
 
 class Token
+  attr_reader :token_type, :lexeme, :literal
+
   def initialize(token_type, lexeme=nil, literal=nil)
     @token_type = token_type
     @lexeme = lexeme
