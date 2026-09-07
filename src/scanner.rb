@@ -38,15 +38,24 @@ class Scanner
       add_token(type)
     elsif (type = TokenType::SINGLE_CHAR_TOKENS[c])
       add_token(type)
-    elsif digit?(c)
-      add_token(TokenType::NUMBER)
+    elsif c == '"'
+      @start = @current
+      advance while peek != '"' && !at_end?
+      raise Error, 'Unterminated string.' if at_end?
+
+      advance
+      lexeme = @source[@start...@current - 1]
+      add_token(TokenType::STRING, lexeme)
+
+    # elsif digit?(c)
+    #   add_token(TokenType::NUMBER)
     else
       raise Error, "Unexpected character: #{c}"
     end
   end
 
-  def add_token(type)
-    @tokens << { type: type }
+  def add_token(type, lexeme = nil)
+    @tokens << { type: type, lexeme: lexeme }
   end
 
   def peek
