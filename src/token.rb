@@ -12,6 +12,9 @@ module TokenType
   MINUS = :minus
   BANG = :bang
 
+  # Puede ser un slash, o dos slashes un comentario
+  SLASH = :slash
+
   # Token de dos caracteres
   BANG_EQUAL = :bang_equal
   EQUAL_EQUAL = :equal_equal
@@ -54,7 +57,8 @@ module TokenType
     '+' => TokenType::PLUS,
     ';' => TokenType::SEMICOLON,
     '*' => TokenType::STAR,
-    '!' => TokenType::BANG
+    '!' => TokenType::BANG,
+    '/' => TokenType::SLASH,
   }.freeze
 
   DOUBLE_CHAR_TOKENS = {

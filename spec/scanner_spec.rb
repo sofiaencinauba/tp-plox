@@ -94,7 +94,18 @@ RSpec.describe Scanner do
         )
       end
     end
-
+    describe 'scan_comments' do
+      it 'devuelve un slash para una fuente con un slash' do
+        expect(Scanner.new('/').scan).to contain_exactly(be_a(Token).and(have_attributes(token_type: :slash,
+                                                                                          lexeme: nil, literal: nil)))
+      end
+      it 'ignora la linea para una fuente con unica linea de comentario' do
+        expect(Scanner.new('//').scan).to contain_exactly()
+      end
+      it 'ignora la linea para una fuente con unica linea de comentario' do
+        expect(Scanner.new('//hola').scan).to contain_exactly()
+      end
+    end
     describe 'scan_keywords' do
       it 'devuelve una keyword para una fuente con un string keyword' do
         expect(Scanner.new('and').scan).to contain_exactly(be_a(Token).and(have_attributes(token_type: :and,

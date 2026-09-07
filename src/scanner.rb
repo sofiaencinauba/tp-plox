@@ -33,7 +33,13 @@ class Scanner
 
     return if WHITESPACE.include?(c)
 
-    if (type = TokenType::DOUBLE_CHAR_TOKENS[c + peek])
+    if (c == '/')
+      if peek == '/'
+        advance while !at_end?
+      else
+        add_token(TokenType::SLASH)
+      end
+    elsif (type = TokenType::DOUBLE_CHAR_TOKENS[c + peek])
       advance
       add_token(type)
     elsif (type = TokenType::SINGLE_CHAR_TOKENS[c])
