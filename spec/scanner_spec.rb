@@ -18,11 +18,14 @@ RSpec.describe Scanner do
       end
     end
 
-    # describe 'scan_digit' do
-    #   it 'devuelve un número para una fuente con un número' do
-    #     expect(Scanner.new('1').scan).to eq([{ type: :number, lexeme: 1 }])
-    #   end
-    # end
+    describe 'scan_digit' do
+      it 'devuelve un número para una fuente con un número' do
+        expect(Scanner.new('1').scan).to eq([{ type: :number, lexeme: "1" }])
+      end
+      it 'devuelve un numero de 3 digitos para una fuente con numero de 3 digitos' do
+        expect(Scanner.new('123').scan).to eq([{ type: :number, lexeme: "123"}])
+      end
+    end
 
     describe 'scan_double_token' do
       it 'devuelve un signo de desigualdad para una fuente con signo de desigualdad' do

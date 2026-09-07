@@ -47,8 +47,12 @@ class Scanner
       lexeme = @source[@start...@current - 1]
       add_token(TokenType::STRING, lexeme)
 
-    # elsif digit?(c)
-    #   add_token(TokenType::NUMBER)
+    elsif digit?(c)
+	  @start = @current - 1
+	  advance while digit?(peek) && !at_end?
+	  
+	  lexeme = @source[@start...@current]
+      add_token(TokenType::NUMBER, lexeme)
     else
       raise Error, "Unexpected character: #{c}"
     end
