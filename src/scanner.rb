@@ -51,6 +51,13 @@ class Scanner
       @start = @current - 1
       advance while digit?(peek) && !at_end?
 
+      if peek == '.' && digit?(peek_next)
+        advance
+        advance while digit?(peek) && !at_end?
+
+        raise Error, "Invalid number: #{@source[@start...@current]}." if peek == '.'
+      end
+
       lexeme = @source[@start...@current]
       add_token(TokenType::NUMBER, lexeme)
 
@@ -85,6 +92,12 @@ class Scanner
 
   def digit?(c)
     c.match?(/\d/)
+  end
+
+  def peek_next
+    return "\0" if @current + 1 >= @source.length
+
+    @source[@current + 1]
   end
 
   def alpha?(c)

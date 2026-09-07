@@ -31,6 +31,13 @@ RSpec.describe Scanner do
         expect(Scanner.new('123').scan).to contain_exactly(be_a(Token).and(have_attributes(token_type: :number,
                                                                                            lexeme: '123', literal: nil)))
       end
+      it 'devuelve un numero flotante para una fuente con numero flotante' do
+        expect(Scanner.new('123.15').scan).to contain_exactly(be_a(Token).and(have_attributes(token_type: :number,
+                                                                                              lexeme: '123.15', literal: nil)))
+      end
+      it 'lanza un error para un número con más de un punto decimal' do
+        expect { Scanner.new('123.10.15').scan }.to raise_error(Scanner::Error, 'Invalid number: 123.10.')
+      end
     end
 
     describe 'scan_double_token' do
@@ -57,6 +64,9 @@ RSpec.describe Scanner do
         expect(Scanner.new('"hola"').scan).to contain_exactly(be_a(Token).and(have_attributes(token_type: :string,
                                                                                               lexeme: 'hola', literal: nil)))
       end
+      it 'devuelve un error para fuente con string incompleto' do
+        expect { Scanner.new('"hola').scan }.to raise_error(Scanner::Error, 'Unterminated string.')
+      end
     end
 
     describe 'scan_identifier' do
@@ -81,7 +91,7 @@ RSpec.describe Scanner do
       end
       it 'devuelve una keyword para una fuente con un string keyword' do
         expect(Scanner.new('or').scan).to contain_exactly(be_a(Token).and(have_attributes(token_type: :or,
-                                                                                           lexeme: 'or', literal: nil)))
+                                                                                          lexeme: 'or', literal: nil)))
       end
       it 'no devuelve keyword para una fuente con un string keyword en mayuscula' do
         expect(Scanner.new('AND').scan).to contain_exactly(be_a(Token).and(have_attributes(token_type: :identifier,
