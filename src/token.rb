@@ -24,6 +24,26 @@ module TokenType
   STRING = :string
   NUMBER = :number
 
+  # Palabras reservadas
+  AND = :and
+  ELSE = :else
+  FALSE = :false
+  FUN = :fun
+  FOR = :for
+  IF = :if
+  NIL = :nil
+  OR = :or
+  PRINT = :print
+  RETURN = :return
+  SUPER = :super
+  THIS = :this
+  TRUE = :true
+  VAR = :var
+  WHILE = :while
+  
+  # End of file
+  EOF = :eof
+
   SINGLE_CHAR_TOKENS = {
     '(' => TokenType::LEFT_PAREN,
     ')' => TokenType::RIGHT_PAREN,
@@ -44,4 +64,39 @@ module TokenType
     '<=' => TokenType::LESS_EQUAL,
     '>=' => TokenType::GREATER_EQUAL
   }.freeze
+
+  TokenKeywords = {
+    "and": TokenType::AND,
+    "else": TokenType::ELSE,
+    "false": TokenType::FALSE,
+    "fun": TokenType::FUN,
+    "for": TokenType::FOR,
+    "if": TokenType::IF,
+    "nil": TokenType::NIL,
+    "or": TokenType::OR,
+    "print": TokenType::PRINT,
+    "return": TokenType::RETURN,
+    "super": TokenType::SUPER,
+    "this": TokenType::THIS,
+    "true": TokenType::TRUE,
+    "var": TokenType::VAR,
+    "while": TokenType::WHILE,
+  }
+
+end
+
+class Token
+  def initialize(token_type, lexeme=nil, literal=nil)
+    @token_type = token_type
+    @lexeme = lexeme
+    @literal = literal    
+  end
+
+  def inspect
+    if @token_type == TokenType::IDENTIFIER
+      return "#{@token_type}<#{@lexeme}>"
+    end
+    @literal.nil? ? "#{@token_type}" : "#{@token_type}<#{@literal}>"
+  end
+
 end
