@@ -63,7 +63,7 @@ class Scanner
 
     elsif alpha?(c)
       @start = @current - 1
-      advance while alpha?(peek) && !at_end?
+      advance while alpha_numeric?(peek) && !at_end?
 
       lexeme = @source[@start...@current]
       type = TokenType::TOKEN_KEYWORDS.fetch(lexeme.to_sym, TokenType::IDENTIFIER)
@@ -102,6 +102,10 @@ class Scanner
 
   def alpha?(c)
     c.match(/[a-zA-Z_]/)
+  end
+
+  def alpha_numeric?(c)
+    alpha?(c) or digit?(c)
   end
 
   def keyword?(lexeme); end

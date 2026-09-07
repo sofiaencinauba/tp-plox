@@ -79,8 +79,19 @@ RSpec.describe Scanner do
                                                                                            lexeme: 'xyz', literal: nil)))
       end
       it 'devuelve un identificador para una fuente con string no reservado' do
+        expect(Scanner.new('xyz1').scan).to contain_exactly(be_a(Token).and(have_attributes(token_type: :identifier,
+                                                                                           lexeme: 'xyz1', literal: nil)))
+      end
+      it 'devuelve un identificador para una fuente con string no reservado' do
         expect(Scanner.new('x_yz').scan).to contain_exactly(be_a(Token).and(have_attributes(token_type: :identifier,
                                                                                             lexeme: 'x_yz', literal: nil)))
+      end
+      it 'separa un identificador, un punto y un número' do
+        expect(Scanner.new('hola.1').scan).to contain_exactly(
+          be_a(Token).and(have_attributes(token_type: :identifier, lexeme: 'hola', literal: nil)),
+          be_a(Token).and(have_attributes(token_type: :dot, lexeme: nil, literal: nil)),
+          be_a(Token).and(have_attributes(token_type: :number, lexeme: '1', literal: nil))
+        )
       end
     end
 
