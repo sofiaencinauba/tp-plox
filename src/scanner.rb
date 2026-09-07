@@ -1,6 +1,7 @@
 require_relative 'token'
 
 class Scanner
+  class Error < StandardError; end
   WHITESPACE = [' ', "\r", "\t", "\n"].freeze
 
   def initialize(source)
@@ -40,7 +41,7 @@ class Scanner
     elsif digit?(c)
       add_token(TokenType::NUMBER)
     else
-      raise "Unexpected character: #{c}"
+      raise Error, "Unexpected character: #{c}"
     end
   end
 
