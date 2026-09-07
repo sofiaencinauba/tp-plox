@@ -1,6 +1,8 @@
 require_relative 'token'
 
 class Scanner
+  WHITESPACE = [' ', "\r", "\t", "\n"].freeze
+
   def initialize(source)
     # Lista de tokens que se van a ir leyendo
     @tokens = []
@@ -28,7 +30,7 @@ class Scanner
   def scan_token
     c = advance
 
-    return if [' ', "\r", "\t", "\n"].include?(c)
+    return if WHITESPACE.include?(c)
 
     if (type = TokenType::DOUBLE_CHAR_TOKENS[c + peek])
       advance
@@ -59,9 +61,7 @@ class Scanner
   end
 
   def digit?(c)
-    return true if c =~ /[0-9]/
-
-    false
+    c.match?(/\d/)
   end
 
   def at_end?

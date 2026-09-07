@@ -27,3 +27,5 @@ Si agregás gemas al `Gemfile`, reconstruí la imagen para instalarlas:
 ```bash
 docker compose build
 ```
+
+
