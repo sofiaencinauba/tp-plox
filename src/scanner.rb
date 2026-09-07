@@ -1,4 +1,4 @@
-require_relative 'token.rb'
+require_relative 'token'
 
 class Scanner
   class Error < StandardError; end
@@ -44,28 +44,28 @@ class Scanner
       raise Error, 'Unterminated string.' if at_end?
 
       advance
-      lexeme = @source[@start...@current - 1]
+      lexeme = @source[@start...(@current - 1)]
       add_token(TokenType::STRING, lexeme)
 
     elsif digit?(c)
-	  @start = @current - 1
-	  advance while digit?(peek) && !at_end?
-	  
-	  lexeme = @source[@start...@current]
+      @start = @current - 1
+      advance while digit?(peek) && !at_end?
+
+      lexeme = @source[@start...@current]
       add_token(TokenType::NUMBER, lexeme)
 
-	elsif is_alpha?(c)
-	  @start = @current - 1
-	  advance while is_alpha?(peek) && !at_end?
+    elsif alpha?(c)
+      @start = @current - 1
+      advance while alpha?(peek) && !at_end?
 
-	  lexeme = @source[@start..@current]
-	  add_token(TokenType::IDENTIFIER, lexeme)
+      lexeme = @source[@start..@current]
+      add_token(TokenType::IDENTIFIER, lexeme)
     else
       raise Error, "Unexpected character: #{c}"
     end
   end
 
-  def add_token(type, lexeme = nil, literal=nil)
+  def add_token(type, lexeme = nil, literal = nil)
     token = Token.new(type, lexeme, literal)
     @tokens << token
   end
@@ -86,7 +86,7 @@ class Scanner
     c.match?(/\d/)
   end
 
-  def is_alpha?(c)
+  def alpha?(c)
     c.match(/[a-zA-Z_]/)
   end
 

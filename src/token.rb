@@ -10,7 +10,6 @@ module TokenType
   STAR = :star
   PLUS = :plus
   MINUS = :minus
-  EOF = :eof
   BANG = :bang
 
   # Token de dos caracteres
@@ -27,7 +26,7 @@ module TokenType
   # Palabras reservadas
   AND = :and
   ELSE = :else
-  FALSE = :false
+  FALSE = false
   FUN = :fun
   FOR = :for
   IF = :if
@@ -37,10 +36,10 @@ module TokenType
   RETURN = :return
   SUPER = :super
   THIS = :this
-  TRUE = :true
+  TRUE = true
   VAR = :var
   WHILE = :while
-  
+
   # End of file
   EOF = :eof
 
@@ -65,40 +64,37 @@ module TokenType
     '>=' => TokenType::GREATER_EQUAL
   }.freeze
 
-  TokenKeywords = {
-    "and": TokenType::AND,
-    "else": TokenType::ELSE,
-    "false": TokenType::FALSE,
-    "fun": TokenType::FUN,
-    "for": TokenType::FOR,
-    "if": TokenType::IF,
-    "nil": TokenType::NIL,
-    "or": TokenType::OR,
-    "print": TokenType::PRINT,
-    "return": TokenType::RETURN,
-    "super": TokenType::SUPER,
-    "this": TokenType::THIS,
-    "true": TokenType::TRUE,
-    "var": TokenType::VAR,
-    "while": TokenType::WHILE,
-  }
-
+  TOKEN_KEYWORDS = {
+    and: TokenType::AND,
+    else: TokenType::ELSE,
+    false => TokenType::FALSE,
+    fun: TokenType::FUN,
+    for: TokenType::FOR,
+    if: TokenType::IF,
+    nil: TokenType::NIL,
+    or: TokenType::OR,
+    print: TokenType::PRINT,
+    return: TokenType::RETURN,
+    super: TokenType::SUPER,
+    this: TokenType::THIS,
+    true => TokenType::TRUE,
+    var: TokenType::VAR,
+    while: TokenType::WHILE
+  }.freeze
 end
 
 class Token
   attr_reader :token_type, :lexeme, :literal
 
-  def initialize(token_type, lexeme=nil, literal=nil)
+  def initialize(token_type, lexeme = nil, literal = nil)
     @token_type = token_type
     @lexeme = lexeme
-    @literal = literal    
+    @literal = literal
   end
 
   def inspect
-    if @token_type == TokenType::IDENTIFIER
-      return "#{@token_type}<#{@lexeme}>"
-    end
-    @literal.nil? ? "#{@token_type}" : "#{@token_type}<#{@literal}>"
-  end
+    return "#{@token_type}<#{@lexeme}>" if @token_type == TokenType::IDENTIFIER
 
+    @literal.nil? ? @token_type.to_s : "#{@token_type}<#{@literal}>"
+  end
 end
