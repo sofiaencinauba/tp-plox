@@ -21,6 +21,9 @@ RSpec.describe Scanner do
       it 'devuelve un punto y coma para una fuente con punto y coma' do
         expect(Scanner.new(';').scan).to match([token(:semicolon, ';'), token(:eof, '')])
       end
+      it 'devuelve un signo de mayor para una fuente con signo de mayor' do
+        expect(Scanner.new('>').scan).to match([token(:greater, '>'), token(:eof, '')])
+      end
     end
 
     describe 'scan_digit' do

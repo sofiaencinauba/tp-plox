@@ -11,6 +11,9 @@ module TokenType
   PLUS = :plus
   MINUS = :minus
   BANG = :bang
+  EQUAL = :equal
+  LESS = :less
+  GREATER = :greater
 
   # Puede ser un slash, o dos slashes un comentario
   SLASH = :slash
@@ -59,6 +62,9 @@ module TokenType
     '*' => TokenType::STAR,
     '!' => TokenType::BANG,
     '/' => TokenType::SLASH,
+    '=' => TokenType::EQUAL,
+    '<' => TokenType::LESS,
+    '>' => TokenType::GREATER
   }.freeze
 
   DOUBLE_CHAR_TOKENS = {
