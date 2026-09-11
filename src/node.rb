@@ -1,9 +1,6 @@
-class Node
-    attr_accessor :value, :left, :right
-
-    def initialize val,left,right
-        @value = val
-        @left = left
-        @right = right
-    end
+module AST
+  Literal  = Struct.new(:value)
+  Grouping = Struct.new(:expression)
+  Unary    = Struct.new(:operator, :right)
+  Binary   = Struct.new(:left, :operator, :right)
 end
