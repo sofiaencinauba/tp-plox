@@ -10,10 +10,21 @@ class Parser
   end
 
   def parse
-    primary
+    unary
   end
 
   private
+
+    # unary → ( "!" | "-" ) unary | primary
+  def unary
+    if check(TokenType::BANG, TokenType::MINUS)
+      operator = advance
+      right = unary
+      return AST::Unary.new(operator, right)
+    end
+
+    primary
+  end
 
   def primary
     token = advance
@@ -39,5 +50,9 @@ class Parser
 
   def at_end?
     peek.token_type == TokenType::EOF
+  end
+
+  def check(*types)
+    !at_end? && types.include?(peek.token_type)
   end
 end

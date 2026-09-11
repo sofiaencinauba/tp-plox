@@ -7,23 +7,35 @@ RSpec.describe Parser do
     Parser.new(Scanner.new(source).scan).parse
   end
 
-  it 'parsea un número como literal' do
-    expect(parse('1')).to eq(AST::Literal.new(1.0))
-  end
-    
-  it 'parsea un string como literal' do
-    expect(parse('"hola"')).to eq(AST::Literal.new('hola'))
+  describe '#parse literals' do
+    it 'parsea un número como literal' do
+        expect(parse('1')).to eq(AST::Literal.new(1.0))
+    end
+        
+    it 'parsea un string como literal' do
+        expect(parse('"hola"')).to eq(AST::Literal.new('hola'))
+    end
+
+    it 'parsea true' do
+        expect(parse('true')).to eq(AST::Literal.new(true))
+    end
+
+    it 'parsea false' do
+        expect(parse('false')).to eq(AST::Literal.new(false))
+    end
+
+    it 'parsea nil' do
+        expect(parse('nil')).to eq(AST::Literal.new(nil))
+    end
   end
 
-  it 'parsea true' do
-    expect(parse('true')).to eq(AST::Literal.new(true))
-  end
+  describe '#parse unary expressions' do
+    it 'parsea una negación lógica' do
+        resultado = parse('!true')
 
-  it 'parsea false' do
-    expect(parse('false')).to eq(AST::Literal.new(false))
-  end
-
-  it 'parsea nil' do
-    expect(parse('nil')).to eq(AST::Literal.new(nil))
+        expect(resultado).to be_a(AST::Unary)
+        expect(resultado.operator.token_type).to eq(:bang)
+        expect(resultado.right).to eq(AST::Literal.new(true))
+    end
   end
 end
