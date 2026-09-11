@@ -2,12 +2,11 @@ require_relative 'token'
 
 class Scanner
   class Error < StandardError; end
+
   WHITESPACE = [' ', "\r", "\t", "\n"].freeze
 
   def initialize(source)
-    # Lista de tokens que se van a ir leyendo
     @tokens = []
-
     @source = source
     @start = 0
     @current = 0
@@ -33,17 +32,20 @@ class Scanner
 
     return if WHITESPACE.include?(c)
 
-    if (c == '/')
+    if c == '/'
       if peek == '/'
-        advance while peek != "\n" && !at_end?      
+        advance while peek != "\n" && !at_end?
       else
         add_token(TokenType::SLASH)
       end
+
     elsif (type = TokenType::DOUBLE_CHAR_TOKENS[c + peek])
       advance
       add_token(type)
+
     elsif (type = TokenType::SINGLE_CHAR_TOKENS[c])
       add_token(type)
+
     elsif c == '"'
       advance while peek != '"' && !at_end?
       raise Error, 'Unterminated string.' if at_end?
@@ -54,32 +56,34 @@ class Scanner
       add_token(TokenType::STRING, literal)
 
     elsif digit?(c)
-      @start = @current - 1
       advance while digit?(peek) && !at_end?
 
       if peek == '.' && digit?(peek_next)
         advance
         advance while digit?(peek) && !at_end?
 
-        raise Error, "Invalid number: #{@source[@start...@current]}." if peek == '.'
+        raise Error, "Invalid number: #{lexeme}." if peek == '.'
       end
 
-      add_token(TokenType::NUMBER, lexeme().to_f())
+      add_token(TokenType::NUMBER, lexeme.to_f)
 
     elsif alpha?(c)
-      @start = @current - 1
       advance while alpha_numeric?(peek) && !at_end?
 
-      lexeme = @source[@start...@current]
-      type = TokenType::TOKEN_KEYWORDS.fetch(lexeme.to_sym, TokenType::IDENTIFIER)
+      type = TokenType::TOKEN_KEYWORDS.fetch(
+        lexeme.to_sym,
+        TokenType::IDENTIFIER
+      )
+
       add_token(type)
+
     else
       raise Error, "Unexpected character: #{c}"
     end
   end
 
   def add_token(type, literal = nil)
-    @tokens << Token.new(type, lexeme(), literal)
+    @tokens << Token.new(type, lexeme, literal)
   end
 
   def peek
@@ -105,14 +109,12 @@ class Scanner
   end
 
   def alpha?(c)
-    c.match(/[a-zA-Z_]/)
+    c.match?(/[a-zA-Z_]/)
   end
 
   def alpha_numeric?(c)
-    alpha?(c) or digit?(c)
+    alpha?(c) || digit?(c)
   end
-
-  def keyword?(lexeme); end
 
   def at_end?
     @current >= @source.length
