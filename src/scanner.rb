@@ -45,13 +45,13 @@ class Scanner
     elsif (type = TokenType::SINGLE_CHAR_TOKENS[c])
       add_token(type)
     elsif c == '"'
-      @start = @current
       advance while peek != '"' && !at_end?
       raise Error, 'Unterminated string.' if at_end?
 
       advance
-      lexeme = @source[@start...(@current - 1)]
-      add_token(TokenType::STRING, lexeme)
+
+      literal = @source[(@start + 1)...(@current - 1)]
+      add_token(TokenType::STRING, literal)
 
     elsif digit?(c)
       @start = @current - 1
@@ -64,8 +64,7 @@ class Scanner
         raise Error, "Invalid number: #{@source[@start...@current]}." if peek == '.'
       end
 
-      lexeme = @source[@start...@current]
-      add_token(TokenType::NUMBER, lexeme)
+      add_token(TokenType::NUMBER, lexeme().to_f())
 
     elsif alpha?(c)
       @start = @current - 1
@@ -73,15 +72,14 @@ class Scanner
 
       lexeme = @source[@start...@current]
       type = TokenType::TOKEN_KEYWORDS.fetch(lexeme.to_sym, TokenType::IDENTIFIER)
-      add_token(type, lexeme)
+      add_token(type)
     else
       raise Error, "Unexpected character: #{c}"
     end
   end
 
-  def add_token(type, lexeme = nil, literal = nil)
-    token = Token.new(type, lexeme, literal)
-    @tokens << token
+  def add_token(type, literal = nil)
+    @tokens << Token.new(type, lexeme(), literal)
   end
 
   def peek

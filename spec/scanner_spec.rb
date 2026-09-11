@@ -10,30 +10,30 @@ RSpec.describe Scanner do
       end
       it 'devuelve un signo de exclamación para una fuente con signo de exclamación' do
         expect(Scanner.new('!').scan).to contain_exactly(be_a(Token).and(have_attributes(token_type: :bang,
-                                                                                         lexeme: nil, literal: nil)))
+                                                                                         lexeme: "!", literal: nil)))
       end
       it 'devuelve un parentesis derecho para una fuente con parentesis derecho' do
         expect(Scanner.new(')').scan).to contain_exactly(be_a(Token).and(have_attributes(token_type: :right_paren,
-                                                                                         lexeme: nil, literal: nil)))
+                                                                                         lexeme: ")", literal: nil)))
       end
       it 'devuelve un punto y coma para una fuente con punto y coma' do
         expect(Scanner.new(';').scan).to contain_exactly(be_a(Token).and(have_attributes(token_type: :semicolon,
-                                                                                         lexeme: nil, literal: nil)))
+                                                                                         lexeme: ";", literal: nil)))
       end
     end
 
     describe 'scan_digit' do
       it 'devuelve un número para una fuente con un número' do
         expect(Scanner.new('1').scan).to contain_exactly(be_a(Token).and(have_attributes(token_type: :number,
-                                                                                         lexeme: '1', literal: nil)))
+                                                                                         lexeme: '1', literal: 1)))
       end
       it 'devuelve un numero de 3 digitos para una fuente con numero de 3 digitos' do
         expect(Scanner.new('123').scan).to contain_exactly(be_a(Token).and(have_attributes(token_type: :number,
-                                                                                           lexeme: '123', literal: nil)))
+                                                                                           lexeme: '123', literal: 123)))
       end
       it 'devuelve un numero flotante para una fuente con numero flotante' do
         expect(Scanner.new('123.15').scan).to contain_exactly(be_a(Token).and(have_attributes(token_type: :number,
-                                                                                              lexeme: '123.15', literal: nil)))
+                                                                                              lexeme: '123.15', literal: 123.15)))
       end
       it 'lanza un error para un número con más de un punto decimal' do
         expect { Scanner.new('123.10.15').scan }.to raise_error(Scanner::Error, 'Invalid number: 123.10.')
@@ -43,26 +43,26 @@ RSpec.describe Scanner do
     describe 'scan_double_token' do
       it 'devuelve un signo de desigualdad para una fuente con signo de desigualdad' do
         expect(Scanner.new('!=').scan).to contain_exactly(be_a(Token).and(have_attributes(token_type: :bang_equal,
-                                                                                          lexeme: nil, literal: nil)))
+                                                                                          lexeme: "!=", literal: nil)))
       end
       it 'devuelve un signo de igualdad para una fuente con signo de igualdad' do
         expect(Scanner.new('==').scan).to contain_exactly(be_a(Token).and(have_attributes(token_type: :equal_equal,
-                                                                                          lexeme: nil, literal: nil)))
+                                                                                          lexeme: "==", literal: nil)))
       end
       it 'devuelve un signo de menor o igual para una fuente con signo de menor o igual' do
         expect(Scanner.new('<=').scan).to contain_exactly(be_a(Token).and(have_attributes(token_type: :less_equal,
-                                                                                          lexeme: nil, literal: nil)))
+                                                                                          lexeme: "<=", literal: nil)))
       end
       it 'devuelve un signo de mayor o igual para una fuente con signo de mayor o igual' do
         expect(Scanner.new('>=').scan).to contain_exactly(be_a(Token).and(have_attributes(token_type: :greater_equal,
-                                                                                          lexeme: nil, literal: nil)))
+                                                                                          lexeme: ">=", literal: nil)))
       end
     end
 
     describe 'scan_string' do
       it 'devuelve un string para una fuente con un string' do
         expect(Scanner.new('"hola"').scan).to contain_exactly(be_a(Token).and(have_attributes(token_type: :string,
-                                                                                              lexeme: 'hola', literal: nil)))
+                                                                                              lexeme: '"hola"', literal: 'hola')))
       end
       it 'devuelve un error para fuente con string incompleto' do
         expect { Scanner.new('"hola').scan }.to raise_error(Scanner::Error, 'Unterminated string.')
@@ -89,15 +89,15 @@ RSpec.describe Scanner do
       it 'separa un identificador, un punto y un número' do
         expect(Scanner.new('hola.1').scan).to contain_exactly(
           be_a(Token).and(have_attributes(token_type: :identifier, lexeme: 'hola', literal: nil)),
-          be_a(Token).and(have_attributes(token_type: :dot, lexeme: nil, literal: nil)),
-          be_a(Token).and(have_attributes(token_type: :number, lexeme: '1', literal: nil))
+          be_a(Token).and(have_attributes(token_type: :dot, lexeme: '.', literal: nil)),
+          be_a(Token).and(have_attributes(token_type: :number, lexeme: '1', literal: 1))
         )
       end
     end
     describe 'scan_comments' do
       it 'devuelve un slash para una fuente con un slash' do
         expect(Scanner.new('/').scan).to contain_exactly(be_a(Token).and(have_attributes(token_type: :slash,
-                                                                                          lexeme: nil, literal: nil)))
+                                                                                          lexeme: '/', literal: nil)))
       end
       it 'ignora la linea para una fuente con unica linea de comentario' do
         expect(Scanner.new('//').scan).to contain_exactly()
