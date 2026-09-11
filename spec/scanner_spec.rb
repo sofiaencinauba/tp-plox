@@ -116,5 +116,17 @@ RSpec.describe Scanner do
         expect { Scanner.new('@').scan }.to raise_error(Scanner::Error, 'Unexpected character: @')
       end
     end
+
+    describe 'scan_boolean' do
+      it 'devuelve la keyword true' do
+        expect(Scanner.new('true').scan).to match([token(:true, 'true'), token(:eof, '')])
+      end
+      it 'devuelve la keyword false' do
+        expect(Scanner.new('false').scan).to match([token(:false, 'false'), token(:eof, '')])
+      end
+      it 'no devuelve keyword para una fuente con un string keyword en mayuscula' do
+        expect(Scanner.new('TRUE').scan).to match([token(:identifier, 'TRUE'), token(:eof, '')])
+      end
+    end
   end
 end

@@ -32,7 +32,7 @@ module TokenType
   # Palabras reservadas
   AND = :and
   ELSE = :else
-  FALSE = false
+  FALSE = :false
   FUN = :fun
   FOR = :for
   IF = :if
@@ -42,7 +42,7 @@ module TokenType
   RETURN = :return
   SUPER = :super
   THIS = :this
-  TRUE = true
+  TRUE = :true
   VAR = :var
   WHILE = :while
 
@@ -77,7 +77,7 @@ module TokenType
   TOKEN_KEYWORDS = {
     and: TokenType::AND,
     else: TokenType::ELSE,
-    false => TokenType::FALSE,
+    false: TokenType::FALSE,
     fun: TokenType::FUN,
     for: TokenType::FOR,
     if: TokenType::IF,
@@ -87,7 +87,7 @@ module TokenType
     return: TokenType::RETURN,
     super: TokenType::SUPER,
     this: TokenType::THIS,
-    true => TokenType::TRUE,
+    true: TokenType::TRUE,
     var: TokenType::VAR,
     while: TokenType::WHILE
   }.freeze
