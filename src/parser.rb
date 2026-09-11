@@ -19,7 +19,10 @@ class Parser
     token = advance
 
     case token.token_type
-    when TokenType::NUMBER then AST::Literal.new(token.literal)
+    when TokenType::NUMBER, TokenType::STRING then AST::Literal.new(token.literal)
+    when TokenType::TRUE then AST::Literal.new(true)
+    when TokenType::FALSE then AST::Literal.new(false)
+    when TokenType::NIL then AST::Literal.new(nil)
     else raise Error, "Se esperaba una expresión, se encontró #{token.inspect}."
     end
   end
