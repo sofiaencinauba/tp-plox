@@ -37,5 +37,21 @@ RSpec.describe Parser do
         expect(resultado.operator.token_type).to eq(:bang)
         expect(resultado.right).to eq(AST::Literal.new(true))
     end
+
+    it 'parsea una negación aritmética' do
+        resultado = parse('-1')
+
+        expect(resultado).to be_a(AST::Unary)
+        expect(resultado.operator.token_type).to eq(:minus)
+        expect(resultado.right).to eq(AST::Literal.new(1.0))
+    end
+
+    it 'anida unarios a derecha' do
+        resultado = parse('!!true')
+
+        expect(resultado).to be_a(AST::Unary)
+        expect(resultado.right).to be_a(AST::Unary)
+        expect(resultado.right.right).to eq(AST::Literal.new(true))
+    end
   end
 end
