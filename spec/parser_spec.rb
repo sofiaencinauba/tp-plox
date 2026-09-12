@@ -92,5 +92,28 @@ RSpec.describe Parser do
     it 'parsea una entrada vacía como nil' do
       expect(parse('')).to eq(AST::Literal.new(nil))
     end
+
+    it 'respeta la precedencia entre comparación e igualdad' do
+      result = parse('1 < 2 == true')
+
+      expect(result.operator.token_type).to eq(:equal_equal)
+      expect(result.left).to be_a(AST::Binary)
+      expect(result.left.operator.token_type).to eq(:less)
+      expect(result.right).to eq(AST::Literal.new(true))
+    end
+
+    it 'usa paréntesis para cambiar la precedencia' do
+      result = parse('(1 + 2) * 3')
+
+      expect(result.operator.token_type).to eq(:star)
+      expect(result.left).to be_a(AST::Grouping)
+      expect(result.left.expression.operator.token_type).to eq(:plus)
+      expect(result.right).to eq(AST::Literal.new(3.0))
+    end
+
+    it 'falla cuando falta cerrar un paréntesis' do
+      expect { parse('(1 + 2') }
+        .to raise_error(Parser::Error, /paréntesis de cierre/)
+    end
   end
 end

@@ -19,7 +19,7 @@ class Parser
     # Si no hay tokens, devolvemos un nodo literal con valor nil
     return AST::Literal.new(nil) if at_end?
 
-    # Si hay tokens, empezamos a parsear la
+    # Si hay tokens, empezamos a parsear
     equality
   end
 
@@ -90,10 +90,24 @@ class Parser
     token = advance
 
     case token.token_type
-    when TokenType::NUMBER, TokenType::STRING then AST::Literal.new(token.literal)
+    # Si el token es un literal, devolvemos un nodo literal con su valor
     when TokenType::TRUE then AST::Literal.new(true)
     when TokenType::FALSE then AST::Literal.new(false)
     when TokenType::NIL then AST::Literal.new(nil)
+    
+    # Si en cambio es un numero o string, devolvemos un nodo literal con su valor
+    when TokenType::NUMBER, TokenType::STRING then AST::Literal.new(token.literal)
+    
+    when TokenType::LEFT_PAREN
+      expr = expression
+
+      unless check(TokenType::RIGHT_PAREN)
+        raise Error, "Se esperaba un paréntesis de cierre, se encontró #{peek.inspect}."
+      end
+
+      advance
+      AST::Grouping.new(expr)
+
     else raise Error, "Se esperaba una expresión, se encontró #{token.inspect}."
     end
   end
