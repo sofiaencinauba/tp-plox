@@ -94,10 +94,10 @@ class Parser
     when TokenType::TRUE then AST::Literal.new(true)
     when TokenType::FALSE then AST::Literal.new(false)
     when TokenType::NIL then AST::Literal.new(nil)
-    
+
     # Si en cambio es un numero o string, devolvemos un nodo literal con su valor
     when TokenType::NUMBER, TokenType::STRING then AST::Literal.new(token.literal)
-    
+
     when TokenType::LEFT_PAREN
       expr = expression
 
