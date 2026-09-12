@@ -10,10 +10,70 @@ class Parser
   end
 
   def parse
-    unary
+    expression
   end
 
   private
+
+  def expression
+    # Si no hay tokens, devolvemos un nodo literal con valor nil
+    return AST::Literal.new(nil) if at_end?
+
+    # Si hay tokens, empezamos a parsear la
+    equality
+  end
+
+  def equality
+    expr = comparison
+
+    # Mientras sigamos con operadores de igualdad, seguimos construyendo la expresion
+    while check(TokenType::BANG_EQUAL, TokenType::EQUAL_EQUAL)
+      operator = advance
+      right = comparison
+      expr = AST::Binary.new(expr, operator, right)
+    end
+
+    expr
+  end
+
+  def comparison
+    expr = term
+
+    # Mientras sigamos con operadores de comparación, seguimos construyendo la expresion
+    while check(TokenType::GREATER, TokenType::GREATER_EQUAL, TokenType::LESS, TokenType::LESS_EQUAL)
+      operator = advance
+      right = term
+      expr = AST::Binary.new(expr, operator, right)
+    end
+
+    expr
+  end
+
+  def term
+    expr = factor
+
+    # Mientras sigamos con suma o resta, seguimos construyendo la expresion
+    while check(TokenType::MINUS, TokenType::PLUS)
+      operator = advance
+      right = factor
+      expr = AST::Binary.new(expr, operator, right)
+    end
+
+    expr
+  end
+
+  def factor
+    expr = unary
+
+    # Mientras sigamos con multiplicación o division, seguimos construyendo la expresion
+    while check(TokenType::SLASH, TokenType::STAR)
+      operator = advance
+      right = unary
+      expr = AST::Binary.new(expr, operator, right)
+    end
+
+    expr
+  end
 
     # unary → ( "!" | "-" ) unary | primary
   def unary

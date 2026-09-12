@@ -54,4 +54,43 @@ RSpec.describe Parser do
         expect(resultado.right.right).to eq(AST::Literal.new(true))
     end
   end
+
+  describe '#parse binary expressions' do
+    it 'parsea una suma' do
+        result = parse('1 + 2')
+
+        expect(result).to be_a(AST::Binary)
+        expect(result.operator.token_type).to eq(:plus)
+        expect(result.left).to eq(AST::Literal.new(1.0))
+        expect(result.right).to eq(AST::Literal.new(2.0))
+    end
+
+    it 'da mayor precedencia a la multiplicación' do
+        result = parse('1 + 2 * 3')
+
+        expect(result.operator.token_type).to eq(:plus)
+        expect(result.left).to eq(AST::Literal.new(1.0))
+
+        expect(result.right).to be_a(AST::Binary)
+        expect(result.right.operator.token_type).to eq(:star)
+        expect(result.right.left).to eq(AST::Literal.new(2.0))
+        expect(result.right.right).to eq(AST::Literal.new(3.0))
+    end
+
+    it 'agrupa restas hacia la izquierda' do
+        result = parse('1 - 2 - 3')
+
+        expect(result.operator.token_type).to eq(:minus)
+        expect(result.right).to eq(AST::Literal.new(3.0))
+
+        expect(result.left).to be_a(AST::Binary)
+        expect(result.left.operator.token_type).to eq(:minus)
+        expect(result.left.left).to eq(AST::Literal.new(1.0))
+        expect(result.left.right).to eq(AST::Literal.new(2.0))
+    end
+
+    it 'parsea una entrada vacía como nil' do
+        expect(parse('')).to eq(AST::Literal.new(nil))
+    end
+  end
 end
