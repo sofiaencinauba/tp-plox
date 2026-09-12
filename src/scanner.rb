@@ -18,7 +18,7 @@ class Scanner
       scan_token
     end
 
-    @tokens << Token.new(TokenType::EOF, "", nil)
+    @tokens << Token.new(TokenType::EOF, '', nil)
     @tokens
   end
 

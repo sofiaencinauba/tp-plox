@@ -75,7 +75,7 @@ class Parser
     expr
   end
 
-    # unary → ( "!" | "-" ) unary | primary
+  # unary → ( "!" | "-" ) unary | primary
   def unary
     if check(TokenType::BANG, TokenType::MINUS)
       operator = advance
