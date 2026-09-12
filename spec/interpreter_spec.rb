@@ -33,6 +33,18 @@ RSpec.describe Interpreter do
     expect { interpret('1 == "1"') }.to output("false\n").to_stdout
   end
 
+  it 'considera dos valores nil como iguales' do
+    expect { interpret('nil == nil') }.to output("true\n").to_stdout
+  end
+
+  it 'compara correctamente dos negaciones de nil' do
+    expect { interpret('!nil == !nil') }.to output("true\n").to_stdout
+  end
+
+  it 'considera falso que nil sea diferente de nil' do
+    expect { interpret('nil != nil') }.to output("false\n").to_stdout
+  end
+
   it 'concatena dos strings' do
     expect { interpret('"a" + "b"') }.to output("ab\n").to_stdout
   end
