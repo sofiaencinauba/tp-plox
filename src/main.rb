@@ -25,7 +25,7 @@ class Rlox
     statements = parser.parse
 
     if @mode == :parsing
-        puts statements
+        puts ASTPrinter.new.print(statements)
         return
     end
 
