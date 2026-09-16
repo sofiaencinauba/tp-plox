@@ -1,24 +1,42 @@
 require_relative 'token'
-require_relative 'node'
+require_relative 'ast_node'
+require_relative 'expression'
+require_relative 'statement'
+require_relative 'env'
 
 class Interpreter
   class Error < StandardError; end
 
-  # def initialize(statements)
-  #     @statements = statements
-  # end
+  def initialize(environment = Env.new)
+    @environment = environment
+  end
 
-  def interpret(expression)
-    value = evaluate(expression)
-    puts value
+  def interpret(node)
+    if node.is_a?(AST::Statement)
+      execute(node)
+    else
+      puts evaluate(node)
+    end
   end
 
   private
+
+  def execute(statement)
+    case statement
+    when AST::VarDeclaration
+      value = statement.initializer.nil? ? nil : evaluate(statement.initializer)
+      @environment.define(statement.name.lexeme, value)
+    else
+      raise Error, "Se encontró un tipo de statement desconocido: #{statement.class}"
+    end
+  end
 
   def evaluate(expr)
     case expr
     when AST::Literal
       expr.value
+    when AST::Variable
+      @environment.get(expr.name.lexeme)
     when AST::Grouping
       evaluate(expr.expression)
     when AST::Unary
