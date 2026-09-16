@@ -20,24 +20,23 @@ class Rlox
       end
       return
     end
-    
+
     parser = Parser.new(tokens)
     statements = parser.parse
 
     if @mode == :parsing
-        puts ASTPrinter.new.print(statements)
-        return
+      puts ASTPrinter.new.print(statements)
+      return
     end
 
     @interpreter.interpret(statements)
-    rescue Scanner::Error => e
-        puts "Scanning Error: #{e}"
-    rescue Parser::Error => e
-        puts "Parsing Error: #{e}"
-    rescue Interpreter::Error => e
-        puts "Runtime Error: #{e}"
-    end
-  
+  rescue Scanner::Error => e
+    puts "Scanning Error: #{e}"
+  rescue Parser::Error => e
+    puts "Parsing Error: #{e}"
+  rescue Interpreter::Error => e
+    puts "Runtime Error: #{e}"
+  end
 end
 
 rlox = Rlox.new
@@ -49,7 +48,7 @@ elsif ARGV.include?('--parsing')
 end
 
 loop do
-  print "> "
+  print '> '
   source = STDIN.gets
 
   break if source.nil?

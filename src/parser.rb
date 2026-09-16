@@ -98,9 +98,7 @@ class Parser
     when TokenType::NIL then AST::Literal.new(nil)
 
     when TokenType::VAR
-      unless check(TokenType::IDENTIFIER)
-        raise Error, "Se esperaba un nombre de variable, se encontró #{peek.inspect}."
-      end
+      raise Error, "Se esperaba un nombre de variable, se encontró #{peek.inspect}." unless check(TokenType::IDENTIFIER)
 
       name = advance
       initializer = nil
