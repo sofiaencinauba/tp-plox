@@ -1,5 +1,7 @@
 require_relative 'token'
-require_relative 'node'
+require_relative 'ast_node'
+require_relative 'expression'
+require_relative 'statement'
 
 class Parser
   class Error < StandardError; end
@@ -94,6 +96,23 @@ class Parser
     when TokenType::TRUE then AST::Literal.new(true)
     when TokenType::FALSE then AST::Literal.new(false)
     when TokenType::NIL then AST::Literal.new(nil)
+
+    when TokenType::VAR
+      unless check(TokenType::IDENTIFIER)
+        raise Error, "Se esperaba un nombre de variable, se encontró #{peek.inspect}."
+      end
+
+      name = advance
+      initializer = nil
+
+      if check(TokenType::EQUAL)
+        advance
+        initializer = expression
+      end
+
+      AST::VarDeclaration.new(name, initializer)
+
+    when TokenType::IDENTIFIER then AST::Variable.new(token)
 
     # Si en cambio es un numero o string, devolvemos un nodo literal con su valor
     when TokenType::NUMBER, TokenType::STRING then AST::Literal.new(token.literal)

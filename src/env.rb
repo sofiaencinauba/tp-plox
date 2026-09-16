@@ -1,5 +1,5 @@
 require_relative 'token'
-require_relative 'node'
+require_relative 'ast_node'
 
 class Env
   class Error < StandardError; end
@@ -16,7 +16,7 @@ class Env
   def get(name)
     return @values[name] if @values.key?(name)
     return @enclosing.get(name) if @enclosing
-    
+
     raise Error, "Variable '#{name}' no definida."
   end
 
@@ -27,7 +27,7 @@ class Env
     end
 
     return @enclosing.assign(name, value) if @enclosing
-    
+
     raise Error, "Variable '#{name}' no definida."
   end
 end
