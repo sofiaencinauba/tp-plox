@@ -67,6 +67,38 @@ RSpec.describe Parser do
     end
   end
 
+  describe '#parse if' do
+    it 'parsea condición y rama then sin else' do
+      statement = parse_program('if (1 < 2) print "si";').statements.first
+
+      expect(statement).to be_a(AST::IfStatement)
+      expect(statement.condition).to be_a(AST::Binary)
+      expect(statement.condition.operator.token_type).to eq(TokenType::LESS)
+      expect(statement.then_branch).to be_a(AST::PrintStatement)
+      expect(statement.else_branch).to be_nil
+    end
+
+    it 'parsea las dos ramas' do
+      statement = parse_program('if (true) print "si" else print "no";').statements.first
+
+      expect(statement.then_branch.expression).to eq(AST::Literal.new('si'))
+      expect(statement.else_branch.expression).to eq(AST::Literal.new('no'))
+    end
+
+    it 'asocia else con el if más cercano' do
+      outer = parse_program('if (true) if (false) print 1 else print 2;').statements.first
+
+      expect(outer.else_branch).to be_nil
+      expect(outer.then_branch).to be_a(AST::IfStatement)
+      expect(outer.then_branch.else_branch).to be_a(AST::PrintStatement)
+    end
+
+    it 'rechaza paréntesis faltantes en la condición' do
+      expect { parse_program('if true) print 1;') }.to raise_error(Parser::Error, /después de if/)
+      expect { parse_program('if (true print 1;') }.to raise_error(Parser::Error, /después de la condición/)
+    end
+  end
+
   describe '#parse literals' do
     it 'parsea un número como literal' do
       expect(parse_expression('1')).to eq(AST::Literal.new(1.0))

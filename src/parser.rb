@@ -39,6 +39,15 @@ class Parser
     when TokenType::LEFT_BRACE
       advance
       block_statement
+    when TokenType::IF
+      advance
+      if_statement
+    when TokenType::WHILE
+      advance
+      while_statement
+    when TokenType::FOR
+      advance
+      for_statement
     else
       expression
     end
@@ -71,16 +80,62 @@ class Parser
 
     until at_end? || check(TokenType::RIGHT_BRACE)
       statements << statement
-      raise Error, "Se esperaba ';' después de la instrucción, se encontró #{peek.inspect}." unless check(TokenType::SEMICOLON)
+      unless check(TokenType::SEMICOLON)
+        raise Error, "Se esperaba ';' después de la instrucción, se encontró #{peek.inspect}."
+      end
 
       advance
     end
 
-    raise Error, "Se esperaba '}' al final del bloque, se encontró #{peek.inspect}." unless check(TokenType::RIGHT_BRACE)
+    unless check(TokenType::RIGHT_BRACE)
+      raise Error, "Se esperaba '}' al final del bloque, se encontró #{peek.inspect}."
+    end
 
     advance
     AST::BlockStatement.new(statements)
+  end
 
+  def if_statement
+    raise Error, "Se esperaba '(' después de if, se encontró #{peek.inspect}." unless check(TokenType::LEFT_PAREN)
+
+    advance
+
+    condition = expression
+
+    unless check(TokenType::RIGHT_PAREN)
+      raise Error, "Se esperaba ')' después de la condición, se encontró #{peek.inspect}."
+    end
+
+    advance
+
+    then_branch = statement
+
+    if check(TokenType::ELSE)
+      advance
+      else_branch = statement
+    else
+      else_branch = nil
+    end
+
+    AST::IfStatement.new(condition, then_branch, else_branch)
+  end
+
+  def while_statement
+    raise Error, "Se esperaba '(' después de while, se encontró #{peek.inspect}." unless check(TokenType::LEFT_PAREN)
+
+    advance
+
+    condition = expression
+
+    unless check(TokenType::RIGHT_PAREN)
+      raise Error, "Se esperaba ')' después de la condición, se encontró #{peek.inspect}."
+    end
+
+    advance
+
+    body = statement
+
+    AST::WhileStatement.new(condition, body)
   end
 
   def expression

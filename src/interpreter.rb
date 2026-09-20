@@ -32,6 +32,13 @@ class Interpreter
       puts evaluate(statement.expression)
     when AST::BlockStatement
       execute_block(statement.statements)
+    when AST::IfStatement
+      condition = evaluate(statement.condition)
+      if truthy?(condition)
+        interpret(statement.then_branch)
+      elsif statement.else_branch
+        interpret(statement.else_branch)
+      end
     else
       raise Error, "Se encontró un tipo de statement desconocido: #{statement.class}"
     end

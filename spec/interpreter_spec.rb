@@ -79,6 +79,35 @@ RSpec.describe Interpreter do
     end
   end
 
+  describe 'if' do
+    it 'ejecuta la rama then cuando la condición es verdadera' do
+      expect { interpret('if (true) print "then";') }.to output("then\n").to_stdout
+    end
+
+    it 'no ejecuta la rama then cuando la condición es falsa y no hay else' do
+      expect { interpret('if (false) print "then";') }.not_to output.to_stdout
+    end
+
+    it 'ejecuta la rama else cuando la condición es falsa' do
+      expect { interpret('if (false) print "then" else print "else";') }.to output("else\n").to_stdout
+    end
+
+    it 'considera nil falso y otros valores verdaderos' do
+      source = 'if (nil) print "then" else print "else"; if (0) print "numero";'
+
+      expect { interpret(source) }.to output("else\nnumero\n").to_stdout
+    end
+
+    it 'evalúa solamente la rama elegida' do
+      expect { interpret('if (true) print "ok" else print desconocida;') }.to output("ok\n").to_stdout
+      expect { interpret('if (false) print desconocida else print "ok";') }.to output("ok\n").to_stdout
+    end
+
+    it 'ejecuta un bloque como rama then' do
+      expect { interpret('if (true) { var a = 1; print a; };') }.to output("1.0\n").to_stdout
+    end
+  end
+
   it 'respeta la precedencia entre suma y multiplicación' do
     expect { interpret('1 + 2 * 3;') }.to output("7.0\n").to_stdout
   end
