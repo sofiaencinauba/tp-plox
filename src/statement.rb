@@ -102,4 +102,19 @@ class AST
       "WhileStatement: while #{@condition} do #{@body}"
     end
   end
+
+  class ForStatement < Statement
+    attr_reader :initializer, :condition, :increment, :body
+
+    def initialize(initializer, condition, increment, body)
+      @initializer = initializer
+      @condition = condition
+      @increment = increment
+      @body = body
+    end
+
+    def to_s
+      "ForStatement: for #{@initializer}; #{@condition}; #{@increment} do #{@body}"
+    end
+  end
 end

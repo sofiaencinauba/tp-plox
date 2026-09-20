@@ -43,6 +43,12 @@ class Interpreter
       while truthy?(evaluate(statement.condition))
         interpret(statement.body)
       end
+    when AST::ForStatement
+      execute(statement.initializer) if statement.initializer
+      while statement.condition.nil? || truthy?(evaluate(statement.condition))
+        interpret(statement.body)
+        evaluate(statement.increment) if statement.increment
+      end
     else
       raise Error, "Se encontró un tipo de statement desconocido: #{statement.class}"
     end

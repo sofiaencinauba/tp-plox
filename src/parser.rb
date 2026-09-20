@@ -138,6 +138,41 @@ class Parser
     AST::WhileStatement.new(condition, body)
   end
 
+  def for_statement
+    raise Error, "Se esperaba '(' después de for, se encontró #{peek.inspect}." unless check(TokenType::LEFT_PAREN)
+  
+    advance 
+
+    # TODO: Falta handlear cuando se utiliza una variable declarada fuera del for
+    initializer = nil
+    if check(TokenType::VAR)
+      initializer = var_declaration
+    end
+
+    raise Error, "Se esperaba ';' después del inicializador, se encontró #{peek.inspect}." unless check(TokenType::SEMICOLON)
+    advance
+
+    condition = nil
+    if !check(TokenType::SEMICOLON)
+      condition = expression
+    end
+
+    raise Error, "Se esperaba ';' después de la condición, se encontró #{peek.inspect}." unless check(TokenType::SEMICOLON)
+    advance
+
+    increment = nil
+    if !check(TokenType::RIGHT_PAREN)
+      increment = expression
+    end
+
+    raise Error, "Se esperaba ')' después del incremento, se encontró #{peek.inspect}." unless check(TokenType::RIGHT_PAREN)
+    advance
+
+    body = statement
+
+    AST::ForStatement.new(initializer, condition, increment, body)
+  end
+
   def expression
     # Si hay tokens, empezamos a parsear
     equality
