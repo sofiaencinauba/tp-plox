@@ -16,7 +16,9 @@ class Parser
     until at_end?
       statements << statement
 
-      raise Error, "Se esperaba ';' después de la instrucción, se encontró #{peek.inspect}." unless check(TokenType::SEMICOLON)
+      unless check(TokenType::SEMICOLON)
+        raise Error, "Se esperaba ';' después de la instrucción, se encontró #{peek.inspect}."
+      end
 
       advance
     end
@@ -34,7 +36,9 @@ class Parser
     when TokenType::PRINT
       advance
       print_statement
-
+    when TokenType::LEFT_BRACE
+      advance
+      block_statement
     else
       expression
     end
@@ -60,6 +64,23 @@ class Parser
     raise Error, 'Se esperaba una expresión después de print.' if at_end?
 
     AST::PrintStatement.new(expression)
+  end
+
+  def block_statement
+    statements = []
+
+    until at_end? || check(TokenType::RIGHT_BRACE)
+      statements << statement
+      raise Error, "Se esperaba ';' después de la instrucción, se encontró #{peek.inspect}." unless check(TokenType::SEMICOLON)
+
+      advance
+    end
+
+    raise Error, "Se esperaba '}' al final del bloque, se encontró #{peek.inspect}." unless check(TokenType::RIGHT_BRACE)
+
+    advance
+    AST::BlockStatement.new(statements)
+
   end
 
   def expression

@@ -30,6 +30,8 @@ class Interpreter
       @environment.define(statement.name.lexeme, value)
     when AST::PrintStatement
       puts evaluate(statement.expression)
+    when AST::BlockStatement
+      statement.statements.each { |s| interpret(s) }
     else
       raise Error, "Se encontró un tipo de statement desconocido: #{statement.class}"
     end
