@@ -39,6 +39,10 @@ class Interpreter
       elsif statement.else_branch
         interpret(statement.else_branch)
       end
+    when AST::WhileStatement
+      while truthy?(evaluate(statement.condition))
+        interpret(statement.body)
+      end
     else
       raise Error, "Se encontró un tipo de statement desconocido: #{statement.class}"
     end
