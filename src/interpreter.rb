@@ -31,10 +31,18 @@ class Interpreter
     when AST::PrintStatement
       puts evaluate(statement.expression)
     when AST::BlockStatement
-      statement.statements.each { |s| interpret(s) }
+      execute_block(statement.statements)
     else
       raise Error, "Se encontró un tipo de statement desconocido: #{statement.class}"
     end
+  end
+
+  def execute_block(statements)
+    previous_environment = @environment
+    @environment = Env.new(previous_environment)
+    statements.each { |statement| interpret(statement) }
+  ensure
+    @environment = previous_environment
   end
 
   def evaluate(expr)

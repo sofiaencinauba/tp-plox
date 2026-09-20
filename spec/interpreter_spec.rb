@@ -45,6 +45,40 @@ RSpec.describe Interpreter do
     expect { interpreter.interpret(parse_program('print a;')) }.to output("1.0\n").to_stdout
   end
 
+  describe 'scopes de bloques' do
+    it 'lee variables declaradas en el entorno exterior' do
+      expect { interpret('var a = 1; { print a; };') }.to output("1.0\n").to_stdout
+    end
+
+    it 'lee variables declaradas en el entorno exterior con doble llave' do
+      expect { interpret('var a = 1; {{ print a; }; };') }.to output("1.0\n").to_stdout
+    end
+
+    it 'permite sombrear una variable sin cambiar su valor exterior' do
+      source = 'var a = "global"; { var a = "local"; print a; }; print a;'
+
+      expect { interpret(source) }.to output("local\nglobal\n").to_stdout
+    end
+
+    it 'no deja acceder desde fuera a una variable local' do
+      expect { interpret('{ var a = 1; }; print a;') }
+        .to raise_error(Env::Error, "Variable 'a' no definida.")
+    end
+
+    it 'permite que un bloque anidado lea una variable de su bloque padre' do
+      expect { interpret('{ var a = 1; { print a; }; };') }.to output("1.0\n").to_stdout
+    end
+
+    it 'restaura el entorno anterior aunque una instrucción del bloque falle' do
+      interpreter = described_class.new
+      interpreter.interpret(parse_program('var a = "global";'))
+
+      expect { interpreter.interpret(parse_program('{ var a = "local"; print desconocida; };')) }
+        .to raise_error(Env::Error, "Variable 'desconocida' no definida.")
+      expect { interpreter.interpret(parse_program('print a;')) }.to output("global\n").to_stdout
+    end
+  end
+
   it 'respeta la precedencia entre suma y multiplicación' do
     expect { interpret('1 + 2 * 3;') }.to output("7.0\n").to_stdout
   end
