@@ -12,7 +12,9 @@ class Interpreter
   end
 
   def interpret(node)
-    if node.is_a?(AST::Statement)
+    if node.is_a?(AST::Program)
+      node.statements.each { |statement| interpret(statement) }
+    elsif node.is_a?(AST::Statement)
       execute(node)
     else
       puts evaluate(node)
@@ -26,6 +28,8 @@ class Interpreter
     when AST::VarDeclaration
       value = statement.initializer.nil? ? nil : evaluate(statement.initializer)
       @environment.define(statement.name.lexeme, value)
+    when AST::PrintStatement
+      puts evaluate(statement.expression)
     else
       raise Error, "Se encontró un tipo de statement desconocido: #{statement.class}"
     end

@@ -12,15 +12,57 @@ class Parser
   end
 
   def parse
-    expression
+    statements = []
+    until at_end?
+      statements << statement
+
+      raise Error, "Se esperaba ';' después de la instrucción, se encontró #{peek.inspect}." unless check(TokenType::SEMICOLON)
+
+      advance
+    end
+
+    AST::Program.new(statements)
   end
 
   private
 
-  def expression
-    # Si no hay tokens, devolvemos un nodo literal con valor nil
-    return AST::Literal.new(nil) if at_end?
+  def statement
+    case peek.token_type
+    when TokenType::VAR
+      advance
+      var_declaration
+    when TokenType::PRINT
+      advance
+      print_statement
 
+    else
+      expression
+    end
+  end
+
+  def var_declaration
+    raise Error, "Se esperaba un nombre de variable, se encontró #{peek.inspect}." unless check(TokenType::IDENTIFIER)
+
+    name = advance
+    initializer = nil
+
+    if check(TokenType::EQUAL)
+      advance
+      raise Error, 'Se esperaba una expresión después de =.' if at_end?
+
+      initializer = expression
+    end
+
+    AST::VarDeclaration.new(name, initializer)
+  end
+
+  def print_statement
+    raise Error, 'Se esperaba una expresión después de print.' if at_end?
+
+    AST::PrintStatement.new(expression)
+  end
+
+  def expression
     # Si hay tokens, empezamos a parsear
     equality
   end
@@ -96,19 +138,6 @@ class Parser
     when TokenType::TRUE then AST::Literal.new(true)
     when TokenType::FALSE then AST::Literal.new(false)
     when TokenType::NIL then AST::Literal.new(nil)
-
-    when TokenType::VAR
-      raise Error, "Se esperaba un nombre de variable, se encontró #{peek.inspect}." unless check(TokenType::IDENTIFIER)
-
-      name = advance
-      initializer = nil
-
-      if check(TokenType::EQUAL)
-        advance
-        initializer = expression
-      end
-
-      AST::VarDeclaration.new(name, initializer)
 
     when TokenType::IDENTIFIER then AST::Variable.new(token)
 
