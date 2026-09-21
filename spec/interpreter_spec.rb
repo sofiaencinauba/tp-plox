@@ -196,4 +196,19 @@ RSpec.describe Interpreter do
       expect { interpret('nil or false;') }.to output("false\n").to_stdout
     end
   end
+
+  describe 'asignación de variables' do
+    it 'asigna un valor a una variable existente' do
+      environment = Env.new
+      interpreter = described_class.new(environment)
+      interpreter.interpret(parse_program('var a = 1;'))
+      interpreter.interpret(parse_program('a = 2;'))
+
+      expect(environment.get('a')).to eq(2.0)
+    end
+
+    it 'rechaza la asignación a una variable no declarada' do
+      expect { interpret('a = 1;') }.to raise_error(Env::Error, "Variable 'a' no definida.")
+    end
+  end
 end

@@ -177,7 +177,24 @@ class Parser
   end
 
   def expression
-    logic_or
+    assignment
+  end
+
+  def assignment
+    raise Error, 'nombre de variable' if check(TokenType::EQUAL)
+
+    expr = logic_or
+
+    if check(TokenType::EQUAL)
+      raise Error, 'nombre de variable' unless expr.is_a?(AST::Variable)
+      raise Error, 'Se esperaba una expresión' if at_end?
+
+      operator = advance
+      value = assignment
+      return AST::Assignment.new(expr, operator, value)
+    end
+
+    expr
   end
 
   def logic_or

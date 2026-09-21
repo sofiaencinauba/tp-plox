@@ -58,7 +58,7 @@ RSpec.describe Parser do
       program = parse_program('var a = 1; print a;')
 
       expect(program.statements.map(&:class)).to eq([AST::VarDeclaration, AST::PrintStatement])
-      expect(program.statements.last.expression.name.lexeme).to eq('a')
+      expect(program.statements.last.expression.name).to eq('a')
     end
 
     it 'rechaza una declaración sin nombre y print sin expresión' do
@@ -222,6 +222,32 @@ RSpec.describe Parser do
       expect(result.operator.token_type).to eq(:or)
       expect(result.left).to eq(AST::Literal.new(true))
       expect(result.right).to eq(AST::Literal.new(false))
+    end
+  end
+
+  describe '#parse assignment expressions' do
+    it 'parsea una asignación simple' do
+      result = parse_expression('a = 1')
+
+      expect(result).to be_a(AST::Assignment)
+      expect(result.name).to eq('a')
+      expect(result.value).to eq(AST::Literal.new(1.0))
+    end
+
+    it 'rechaza una asignación sin nombre de variable' do
+      expect { parse_expression('= 1') }.to raise_error(Parser::Error, /nombre de variable/)
+    end
+
+    it 'rechaza una asignación a un literal' do
+      expect { parse_expression('1 = 2') }.to raise_error(Parser::Error, /nombre de variable/)
+    end
+
+    it 'rechaza una asignación a una expresión' do
+      expect { parse_expression('(a + b) = 1') }.to raise_error(Parser::Error, /nombre de variable/)
+    end
+
+    it 'rechaza una asignación sin valor' do
+      expect { parse_expression('a =') }.to raise_error(Parser::Error, /Se esperaba una expresión/)
     end
   end
 end

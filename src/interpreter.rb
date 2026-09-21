@@ -65,7 +65,7 @@ class Interpreter
     when AST::Literal
       expr.value
     when AST::Variable
-      @environment.get(expr.name.lexeme)
+      @environment.get(expr.name)
     when AST::Grouping
       evaluate(expr.expression)
     when AST::Unary
@@ -83,6 +83,9 @@ class Interpreter
       else
         raise Error, "Se encontró un operador lógico desconocido: #{expr.operator.token_type}"
       end
+    when AST::Assignment
+      value = evaluate(expr.value)
+      @environment.assign(expr.name, value)
     else
       raise Error, "Se encontró un tipo de expresión desconocido: #{expr.class}"
     end

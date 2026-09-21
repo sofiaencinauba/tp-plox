@@ -13,7 +13,7 @@ class AST
     attr_reader :name
 
     def initialize(name)
-      @name = name
+      @name = name.lexeme
     end
   end
 
@@ -51,6 +51,16 @@ class AST
       @left = left
       @operator = operator
       @right = right
+    end
+  end
+
+  class Assignment < Expression
+    attr_reader :name, :operator, :value
+
+    def initialize(name, operator, value)
+      @name = name.name
+      @operator = operator
+      @value = value
     end
   end
 end
