@@ -9,7 +9,9 @@ RSpec.describe Interpreter do
   end
 
   def interpret(source)
-    described_class.new.interpret(parse_program(source))
+    program = parse_program(source)
+    result = described_class.new.interpret(program)
+    puts result if program.statements.last.is_a?(AST::ExpressionStatement)
   end
 
   it 'no produce salida para un programa vacío' do
@@ -209,6 +211,14 @@ RSpec.describe Interpreter do
 
     it 'rechaza la asignación a una variable no declarada' do
       expect { interpret('a = 1;') }.to raise_error(Env::Error, "Variable 'a' no definida.")
+    end
+  end
+
+  describe 'for' do
+    it 'ejecuta inicializador, condición e incremento' do
+      source = 'for (var i = 0; i < 3; i = i + 1) print i;'
+
+      expect { interpret(source) }.to output("0.0\n1.0\n2.0\n").to_stdout
     end
   end
 end

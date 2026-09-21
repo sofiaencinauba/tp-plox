@@ -13,11 +13,11 @@ class Interpreter
 
   def interpret(node)
     if node.is_a?(AST::Program)
-      node.statements.each { |statement| interpret(statement) }
+      node.statements.reduce(nil) { |_last_value, statement| execute(statement) }
     elsif node.is_a?(AST::Statement)
       execute(node)
     else
-      puts evaluate(node)
+      evaluate(node)
     end
   end
 
@@ -28,8 +28,12 @@ class Interpreter
     when AST::VarDeclaration
       value = statement.initializer.nil? ? nil : evaluate(statement.initializer)
       @environment.define(statement.name.lexeme, value)
+      nil
     when AST::PrintStatement
       puts evaluate(statement.expression)
+      nil
+    when AST::ExpressionStatement
+      evaluate(statement.expression)
     when AST::BlockStatement
       execute_block(statement.statements)
     when AST::IfStatement
@@ -39,14 +43,17 @@ class Interpreter
       elsif statement.else_branch
         interpret(statement.else_branch)
       end
+      nil
     when AST::WhileStatement
       interpret(statement.body) while truthy?(evaluate(statement.condition))
+      nil
     when AST::ForStatement
       execute(statement.initializer) if statement.initializer
       while statement.condition.nil? || truthy?(evaluate(statement.condition))
         interpret(statement.body)
         evaluate(statement.increment) if statement.increment
       end
+      nil
     else
       raise Error, "Se encontró un tipo de statement desconocido: #{statement.class}"
     end
@@ -55,7 +62,8 @@ class Interpreter
   def execute_block(statements)
     previous_environment = @environment
     @environment = Env.new(previous_environment)
-    statements.each { |statement| interpret(statement) }
+    statements.each { |statement| execute(statement) }
+    nil
   ensure
     @environment = previous_environment
   end

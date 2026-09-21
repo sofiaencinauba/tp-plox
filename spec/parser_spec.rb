@@ -8,7 +8,7 @@ RSpec.describe Parser do
   end
 
   def parse_expression(source)
-    parse_program("#{source};").statements.first
+    parse_program("#{source};").statements.first.expression
   end
 
   describe '#parse program' do
@@ -19,7 +19,9 @@ RSpec.describe Parser do
     it 'incluye cada expresión como un nodo del programa' do
       program = parse_program('1; 2;')
 
-      expect(program.statements).to eq([AST::Literal.new(1.0), AST::Literal.new(2.0)])
+      expect(program.statements).to eq(
+        [AST::ExpressionStatement.new(AST::Literal.new(1.0)), AST::ExpressionStatement.new(AST::Literal.new(2.0))]
+      )
     end
 
     it 'requiere punto y coma al final de cada instrucción' do

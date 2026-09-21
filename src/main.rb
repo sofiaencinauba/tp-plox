@@ -15,7 +15,7 @@ class Rlox
     @interpreter = Interpreter.new
   end
 
-  def run(source)
+  def run(source, display_result: false)
     scanner = Scanner.new(source)
     tokens = scanner.scan
 
@@ -36,7 +36,9 @@ class Rlox
       return
     end
 
-    @interpreter.interpret(program)
+    result = @interpreter.interpret(program)
+    puts result if display_result && program.statements.last.is_a?(AST::ExpressionStatement)
+    result
   rescue Scanner::Error => e
     report_error('Scanning', e)
   rescue Parser::Error => e
@@ -118,7 +120,9 @@ class Rlox
 
       break if source.nil?
 
-      run(source) unless source.strip.empty?
+      unless source.strip.empty?
+        run(source, display_result: true)
+      end
     end
   rescue Interrupt
     puts

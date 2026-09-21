@@ -35,4 +35,12 @@ class AST
       @statements = statements
     end
   end
+
+  class ExpressionStatement < Statement
+    attr_reader :expression
+
+    def initialize(expression)
+      @expression = expression
+    end
+  end
 end

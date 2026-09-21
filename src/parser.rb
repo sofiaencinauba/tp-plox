@@ -49,8 +49,15 @@ class Parser
       advance
       for_statement
     else
-      expression
+      expression_statement
     end
+  end
+
+  def expression_statement
+    raise Error, 'Se esperaba una expresión.' if at_end?
+
+    expr = expression
+    AST::ExpressionStatement.new(expr)
   end
 
   def var_declaration
@@ -145,7 +152,14 @@ class Parser
 
     # TODO: Falta handlear cuando se utiliza una variable declarada fuera del for
     initializer = nil
-    initializer = var_declaration if check(TokenType::VAR)
+    unless check(TokenType::SEMICOLON)
+      initializer = if check(TokenType::VAR)
+                      advance
+                      var_declaration
+                    else
+                      expression_statement
+                    end
+    end
 
     unless check(TokenType::SEMICOLON)
       raise Error, "Se esperaba ';' después del inicializador, se encontró #{peek.inspect}."
