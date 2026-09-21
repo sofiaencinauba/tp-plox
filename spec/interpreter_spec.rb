@@ -163,4 +163,22 @@ RSpec.describe Interpreter do
         'Se esperaba que ambos operandos fueran números, se encontró String y String.'
       )
   end
+
+  describe 'expresiones lógicas' do
+    it 'evalúa correctamente una expresión lógica AND con dos valores true' do
+      expect { interpret('true and true;') }.to output("true\n").to_stdout
+    end
+    it 'evalúa correctamente una expresión lógica AND con un valor false' do
+      expect { interpret('true and false;') }.to output("false\n").to_stdout
+    end
+    it 'evalúa correctamente una expresión lógica AND con un valor nil' do
+      expect { interpret('true and nil;') }.to output("\n").to_stdout
+    end
+    it 'evalúa correctamente una expresión lógica AND con un valor nil y un valor false' do
+      expect { interpret('nil and false;') }.to output("\n").to_stdout
+    end
+    it 'evalúa correctamente una expresión lógica AND con un valor nil y un valor false' do
+      expect { interpret('false and nil;') }.to output("false\n").to_stdout
+    end
+  end
 end

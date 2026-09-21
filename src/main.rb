@@ -1,4 +1,3 @@
-
 require 'reline'
 require 'fileutils'
 require_relative 'scanner'
@@ -38,7 +37,6 @@ class Rlox
     end
 
     @interpreter.interpret(program)
-
   rescue Scanner::Error => e
     report_error('Scanning', e)
   rescue Parser::Error => e
@@ -55,7 +53,7 @@ class Rlox
 
     modes = {
       '--scanning' => :scanning,
-      '--parsing' => :parsing,
+      '--parsing' => :parsing
       # '--resolve' => :resolve #WIP
     }
 
@@ -91,9 +89,9 @@ class Rlox
   def report_error(phase, error)
     warn "#{phase} Error: #{error.message}"
 
-    if @debug
-      warn error.full_message(highlight: true)
-    end
+    return unless @debug
+
+    warn error.full_message(highlight: true)
   end
 
   def run_file(path, line_by_line: false)
@@ -122,7 +120,6 @@ class Rlox
 
       run(source) unless source.strip.empty?
     end
-
   rescue Interrupt
     puts
   ensure
@@ -147,6 +144,4 @@ class Rlox
   end
 end
 
-if __FILE__ == $PROGRAM_NAME
-  Rlox.new.main
-end
+Rlox.new.main if __FILE__ == $PROGRAM_NAME

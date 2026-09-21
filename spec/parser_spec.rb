@@ -204,4 +204,15 @@ RSpec.describe Parser do
         .to raise_error(Parser::Error, /paréntesis de cierre/)
     end
   end
+
+  describe '#parse logical expressions' do
+    it 'parsea logica de AND' do
+      result = parse_expression('true and false')
+
+      expect(result).to be_a(AST::Logical)
+      expect(result.operator.token_type).to eq(:and)
+      expect(result.left).to eq(AST::Literal.new(true))
+      expect(result.right).to eq(AST::Literal.new(false))
+    end
+  end
 end

@@ -40,9 +40,7 @@ class Interpreter
         interpret(statement.else_branch)
       end
     when AST::WhileStatement
-      while truthy?(evaluate(statement.condition))
-        interpret(statement.body)
-      end
+      interpret(statement.body) while truthy?(evaluate(statement.condition))
     when AST::ForStatement
       execute(statement.initializer) if statement.initializer
       while statement.condition.nil? || truthy?(evaluate(statement.condition))
@@ -74,6 +72,12 @@ class Interpreter
       evaluate_unary(expr)
     when AST::Binary
       evaluate_binary(expr)
+    when AST::Logical
+      left = evaluate(expr.left)
+      if expr.operator.token_type == TokenType::AND
+        return left unless truthy?(left)
+        return evaluate(expr.right)
+      end
     else
       raise Error, "Se encontró un tipo de expresión desconocido: #{expr.class}"
     end
