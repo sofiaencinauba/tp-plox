@@ -214,5 +214,14 @@ RSpec.describe Parser do
       expect(result.left).to eq(AST::Literal.new(true))
       expect(result.right).to eq(AST::Literal.new(false))
     end
+
+    it 'parsea logica de OR' do
+      result = parse_expression('true or false')
+
+      expect(result).to be_a(AST::Logical)
+      expect(result.operator.token_type).to eq(:or)
+      expect(result.left).to eq(AST::Literal.new(true))
+      expect(result.right).to eq(AST::Literal.new(false))
+    end
   end
 end

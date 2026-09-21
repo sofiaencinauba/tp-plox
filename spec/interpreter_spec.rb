@@ -180,5 +180,20 @@ RSpec.describe Interpreter do
     it 'evalúa correctamente una expresión lógica AND con un valor nil y un valor false' do
       expect { interpret('false and nil;') }.to output("false\n").to_stdout
     end
+    it 'evalúa correctamente una expresión lógica OR con dos valores false' do
+      expect { interpret('false or false;') }.to output("false\n").to_stdout
+    end
+    it 'evalúa correctamente una expresión lógica OR con un valor true' do
+      expect { interpret('false or true;') }.to output("true\n").to_stdout
+    end
+    it 'evalúa correctamente una expresión lógica OR con un valor nil y un valor false' do
+      expect { interpret('false or nil;') }.to output("\n").to_stdout
+    end
+    it 'evalúa correctamente una expresión lógica OR con un valor nil y un valor true' do
+      expect { interpret('nil or true;') }.to output("true\n").to_stdout
+    end
+    it 'evalúa correctamente una expresión lógica OR con un valor nil y un valor false' do
+      expect { interpret('nil or false;') }.to output("false\n").to_stdout
+    end
   end
 end

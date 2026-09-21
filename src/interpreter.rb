@@ -77,6 +77,11 @@ class Interpreter
       if expr.operator.token_type == TokenType::AND
         return left unless truthy?(left)
         return evaluate(expr.right)
+      elsif expr.operator.token_type == TokenType::OR
+        return left if truthy?(left)
+        return evaluate(expr.right)
+      else
+        raise Error, "Se encontró un operador lógico desconocido: #{expr.operator.token_type}"
       end
     else
       raise Error, "Se encontró un tipo de expresión desconocido: #{expr.class}"

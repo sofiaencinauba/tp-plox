@@ -177,7 +177,19 @@ class Parser
   end
 
   def expression
-    logic_and
+    logic_or
+  end
+
+  def logic_or
+    expr = logic_and
+
+    while check(TokenType::OR)
+      operator = advance
+      right = logic_and
+      expr = AST::Logical.new(expr, operator, right)
+    end 
+  
+    expr
   end
 
   def logic_and
