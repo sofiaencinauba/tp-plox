@@ -7,9 +7,14 @@ class Function
   end
 
   def call(interpreter, arguments)
+    expected = @declaration.params.length
+    unless arguments.length == expected
+      raise ArgumentError, "Se esperaban #{expected} argumentos, se recibieron #{arguments.length}."
+    end
+
     environment = Env.new(@closure_environment)
     @declaration.params.each_with_index do |param, index|
-      environment.define(param.name.lexeme, arguments[index])
+      environment.define(param.lexeme, arguments[index])
     end
     interpreter.execute_block(@declaration.body.statements, environment)
   end
@@ -19,7 +24,7 @@ class Function
   end
 
   def represent
-    params = @declaration.params.map { |param| param.name.lexeme }.join(', ')
+    params = @declaration.params.map(&:lexeme).join(', ')
     "fn #{@declaration.name.lexeme}(#{params})"
   end
 

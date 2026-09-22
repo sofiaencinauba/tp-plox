@@ -112,6 +112,15 @@ class Interpreter
     when AST::Assignment
       value = evaluate(expr.value)
       @environment.assign(expr.name, value)
+    when AST::Call
+      callee = evaluate(expr.callee)
+      arguments = expr.arguments.map { |arg| evaluate(arg) }
+
+      unless callee.is_a?(Function)
+        raise Error, 'Sólo se pueden llamar funciones.'
+      end
+
+      callee.call(self, arguments)
     else
       raise Error, "Se encontró un tipo de expresión desconocido: #{expr.class}"
     end

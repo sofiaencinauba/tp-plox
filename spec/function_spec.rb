@@ -12,7 +12,7 @@ RSpec.describe Function do
   def declaration(name, parameters)
     AST::FunctionDeclaration.new(
       token(name),
-      parameters.map { |parameter| AST::VarDeclaration.new(token(parameter)) },
+      parameters.map { |parameter| token(parameter) },
       AST::BlockStatement.new([])
     )
   end
@@ -42,5 +42,12 @@ RSpec.describe Function do
     expect(function.call(interpreter, [2.0])).to eq(:result)
     expect(captured_environment.get('a')).to eq(2.0)
     expect(captured_environment.get('externa')).to eq(10.0)
+  end
+
+  it 'rechaza una cantidad incorrecta de argumentos' do
+    function = described_class.new(declaration('saludar', []), Env.new)
+
+    expect { function.call(instance_double('Interpreter'), [1.0]) }
+      .to raise_error(ArgumentError, 'Se esperaban 0 argumentos, se recibieron 1.')
   end
 end

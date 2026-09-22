@@ -82,7 +82,7 @@ RSpec.describe Parser do
     it 'parsea los parámetros de una función' do
       declaration = parse_program('fun sumar(a, b) { print a + b; };').statements.first
 
-      expect(declaration.params.map { |param| param.name.lexeme }).to eq(%w[a b])
+      expect(declaration.params.map(&:lexeme)).to eq(%w[a b])
       expect(declaration.body.statements.first).to be_a(AST::PrintStatement)
     end
   end
@@ -242,6 +242,28 @@ RSpec.describe Parser do
       expect(result.operator.token_type).to eq(:or)
       expect(result.left).to eq(AST::Literal.new(true))
       expect(result.right).to eq(AST::Literal.new(false))
+    end
+  end
+
+  describe '#parse call expressions' do
+    it 'parsea una llamada con argumentos' do
+      result = parse_expression('sumar(1, 2)')
+
+      expect(result).to be_a(AST::Call)
+      expect(result.callee).to eq(AST::Variable.new(Token.new(TokenType::IDENTIFIER, 'sumar')))
+      expect(result.arguments).to eq([AST::Literal.new(1.0), AST::Literal.new(2.0)])
+    end
+
+    it 'parsea una llamada sin argumentos' do
+      result = parse_expression('saludar()')
+
+      expect(result).to be_a(AST::Call)
+      expect(result.arguments).to be_empty
+    end
+
+    it 'rechaza una llamada sin cerrar paréntesis' do
+      expect { parse_expression('sumar(1') }
+        .to raise_error(Parser::Error, /Se esperaba '\)' después de los argumentos/)
     end
   end
 

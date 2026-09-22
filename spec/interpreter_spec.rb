@@ -239,10 +239,16 @@ RSpec.describe Interpreter do
       expect(environment.get('saludar')).to be_a(Function)
     end
 
-    # it 'ejecuta una función con el argumento recibido' do
-    #   source = 'fun prueba(x) { print x; }; prueba(2);'
+    it 'ejecuta una función con el argumento recibido' do
+      source = 'fun prueba(x) { print x; }; prueba(2);'
+      interpreter = described_class.new
 
-    #   expect { interpret(source) }.to output("2.0\n").to_stdout
-    # end
+      expect { interpreter.interpret(parse_program(source)) }.to output("2.0\n").to_stdout
+    end
+
+    it 'rechaza llamar a un valor que no es una función' do
+      expect { interpret('var numero = 1; numero();') }
+        .to raise_error(Interpreter::Error, 'Sólo se pueden llamar funciones.')
+    end
   end
 end

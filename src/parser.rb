@@ -206,10 +206,14 @@ class Parser
     advance
 
     if not check(TokenType::RIGHT_PAREN)
-      parameters << var_declaration
+      raise Error, "Se esperaba un nombre de parámetro, se encontró #{peek.inspect}." unless check(TokenType::IDENTIFIER)
+
+      parameters << advance
       while check(TokenType::COMMA)
         advance
-        parameters << var_declaration
+        raise Error, "Se esperaba un nombre de parámetro, se encontró #{peek.inspect}." unless check(TokenType::IDENTIFIER)
+
+        parameters << advance
       end
     end
 
@@ -333,7 +337,33 @@ class Parser
       return AST::Unary.new(operator, right)
     end
 
-    primary
+    call
+  end
+
+  def call
+    expr = primary
+
+    while check(TokenType::LEFT_PAREN)
+      parenthesis = advance
+      arguments = []
+
+      unless check(TokenType::RIGHT_PAREN)
+        arguments << expression
+        while check(TokenType::COMMA)
+          advance
+          arguments << expression
+        end
+      end
+
+      unless check(TokenType::RIGHT_PAREN)
+        raise Error, "Se esperaba ')' después de los argumentos, se encontró #{peek.inspect}."
+      end
+
+      advance
+      expr = AST::Call.new(expr, parenthesis, arguments)
+    end
+
+    expr
   end
 
   def primary

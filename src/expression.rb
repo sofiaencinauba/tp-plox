@@ -63,4 +63,14 @@ class AST
       @value = value
     end
   end
+
+  class Call < Expression
+    attr_reader :callee, :paren, :arguments
+
+    def initialize(callee, paren, arguments)
+      @callee = callee
+      @paren = paren
+      @arguments = arguments
+    end
+  end
 end
