@@ -220,5 +220,12 @@ RSpec.describe Interpreter do
 
       expect { interpret(source) }.to output("0.0\n1.0\n2.0\n").to_stdout
     end
+
+    it 'no permite acceder fuera del for a su variable local' do
+      source = 'for (var i = 0; i < 1; i = i + 1) { }; print i;'
+
+      expect { interpret(source) }
+        .to raise_error(Env::Error, "Variable 'i' no definida.")
+    end
   end
 end

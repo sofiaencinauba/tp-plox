@@ -48,11 +48,20 @@ class Interpreter
       interpret(statement.body) while truthy?(evaluate(statement.condition))
       nil
     when AST::ForStatement
-      execute(statement.initializer) if statement.initializer
-      while statement.condition.nil? || truthy?(evaluate(statement.condition))
-        interpret(statement.body)
-        evaluate(statement.increment) if statement.increment
+      previous_environment = @environment
+      @environment = Env.new(previous_environment)
+
+      begin
+        execute(statement.initializer) if statement.initializer
+
+        while statement.condition.nil? || truthy?(evaluate(statement.condition))
+          interpret(statement.body)
+          evaluate(statement.increment) if statement.increment
+        end
+      ensure
+        @environment = previous_environment
       end
+
       nil
     else
       raise Error, "Se encontró un tipo de statement desconocido: #{statement.class}"
