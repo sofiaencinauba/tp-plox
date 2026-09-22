@@ -69,6 +69,24 @@ RSpec.describe Parser do
     end
   end
 
+  describe '#parse function declarations' do
+    it 'parsea una función sin parámetros' do
+      declaration = parse_program('fun saludar() { print "hola"; };').statements.first
+
+      expect(declaration).to be_a(AST::FunctionDeclaration)
+      expect(declaration.name.lexeme).to eq('saludar')
+      expect(declaration.params).to be_empty
+      expect(declaration.body).to be_a(AST::BlockStatement)
+    end
+
+    it 'parsea los parámetros de una función' do
+      declaration = parse_program('fun sumar(a, b) { print a + b; };').statements.first
+
+      expect(declaration.params.map { |param| param.name.lexeme }).to eq(%w[a b])
+      expect(declaration.body.statements.first).to be_a(AST::PrintStatement)
+    end
+  end
+
   describe '#parse if' do
     it 'parsea condición y rama then sin else' do
       statement = parse_program('if (1 < 2) print "si";').statements.first

@@ -3,6 +3,7 @@ require_relative 'ast_node'
 require_relative 'expression'
 require_relative 'statement'
 require_relative 'env'
+require_relative 'function'
 
 class Interpreter
   class Error < StandardError; end
@@ -64,20 +65,26 @@ class Interpreter
 
       nil
     when AST::FunctionDeclaration
-      ## TODO: Implementar la ejecución de declaraciones de funciones
+      function = Function.new(statement, @environment)
+      @environment.define(statement.name.lexeme, function)
+      nil
     else
       raise Error, "Se encontró un tipo de statement desconocido: #{statement.class}"
     end
   end
 
-  def execute_block(statements)
+  public
+
+  def execute_block(statements, environment = Env.new(@environment))
     previous_environment = @environment
-    @environment = Env.new(previous_environment)
+    @environment = environment
     statements.each { |statement| execute(statement) }
     nil
   ensure
     @environment = previous_environment
   end
+
+  private
 
   def evaluate(expr)
     case expr

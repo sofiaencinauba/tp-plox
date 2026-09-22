@@ -228,4 +228,21 @@ RSpec.describe Interpreter do
         .to raise_error(Env::Error, "Variable 'i' no definida.")
     end
   end
+
+  describe 'declaraciones de funciones' do
+    it 'registra una función en el entorno sin ejecutar su cuerpo' do
+      environment = Env.new
+      interpreter = described_class.new(environment)
+      source = 'fun saludar() { print desconocida; };'
+
+      expect { interpreter.interpret(parse_program(source)) }.not_to raise_error
+      expect(environment.get('saludar')).to be_a(Function)
+    end
+
+    # it 'ejecuta una función con el argumento recibido' do
+    #   source = 'fun prueba(x) { print x; }; prueba(2);'
+
+    #   expect { interpret(source) }.to output("2.0\n").to_stdout
+    # end
+  end
 end
