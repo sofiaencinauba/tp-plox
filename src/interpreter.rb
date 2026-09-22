@@ -63,6 +63,8 @@ class Interpreter
       end
 
       nil
+    when AST::FunctionDeclaration
+      ## TODO: Implementar la ejecución de declaraciones de funciones
     else
       raise Error, "Se encontró un tipo de statement desconocido: #{statement.class}"
     end

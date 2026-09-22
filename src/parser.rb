@@ -48,6 +48,9 @@ class Parser
     when TokenType::FOR
       advance
       for_statement
+    when TokenType::FUN
+      advance
+      function_declaration
     else
       expression_statement
     end
@@ -188,6 +191,41 @@ class Parser
     body = statement
 
     AST::ForStatement.new(initializer, condition, increment, body)
+  end
+
+  def function_declaration
+    raise Error, "Se esperaba un nombre de función, se encontró #{peek.inspect}." unless check(TokenType::IDENTIFIER)
+
+    function_name = advance
+    parameters = []
+
+    unless check(TokenType::LEFT_PAREN)
+      raise Error, "Se esperaba '(' después del nombre de la función, se encontró #{peek.inspect}."
+    end
+
+    advance
+
+    if not check(TokenType::RIGHT_PAREN)
+      parameters << var_declaration
+      while check(TokenType::COMMA)
+        advance
+        parameters << var_declaration
+      end
+    end
+
+    unless check(TokenType::RIGHT_PAREN)
+      raise Error, "Se esperaba ')' después de los parámetros, se encontró #{peek.inspect}."
+    end
+
+    advance
+
+    unless check(TokenType::LEFT_BRACE)
+      raise Error, "Se esperaba '{' al inicio del cuerpo de la función, se encontró #{peek.inspect}."
+    end
+
+    body = statement
+
+    AST::FunctionDeclaration.new(function_name, parameters, body)
   end
 
   def expression
