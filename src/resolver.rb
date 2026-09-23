@@ -23,6 +23,33 @@ class Resolver
 
 		when AST::Assignment
 			resolve(node.value)
+
+		when AST::ExpressionStatement
+			resolve(node.expression)
+
+		when AST::IfStatement
+			resolve(node.condition)
+			resolve(node.then_branch)
+			resolve(node.else_branch) if node.else_branch
+
+		when AST::WhileStatement
+			resolve(node.condition)
+			resolve(node.body)
+
+		when AST::ForStatement
+		begin
+			begin_scope
+			resolve(node.initializer) if node.initializer
+			resolve(node.condition) if node.condition
+			resolve(node.increment) if node.increment
+			resolve(node.body)
+		ensure
+			end_scope
+		end
+
+		when AST::PrintStatement
+			resolve(node.expression)
+
 		end
 	end
 
