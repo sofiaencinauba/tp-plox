@@ -2,6 +2,7 @@ require 'reline'
 require 'fileutils'
 require_relative 'scanner'
 require_relative 'parser'
+require_relative 'resolver'
 require_relative 'interpreter'
 
 class Rlox
@@ -35,6 +36,16 @@ class Rlox
       end
       return
     end
+
+    # if @mode == :resolve
+    #   resolver = Resolver.new(@interpreter)
+    #   resolver.resolve(program)
+    #   puts "Resolución completada con éxito."
+    #   return
+    # end
+
+    resolver = Resolver.new(@interpreter)
+    resolver.resolve(program)
 
     result = @interpreter.interpret(program)
     puts result if display_result && program.statements.last.is_a?(AST::ExpressionStatement)
