@@ -29,6 +29,18 @@ RSpec.describe Resolver do
       expect(interpreter).to have_received(:resolve).with(reference, 1)
     end
 
+    it 'permite redeclarar una variable global entre entradas del REPL' do
+      resolve_source('var a;')
+
+      expect { resolve_source('var a;') }.not_to raise_error
+    end
+
+    it 'rechaza redeclarar una variable dentro del mismo scope local' do
+      expect do
+        resolve_source('{ var a = 1; var a = 2; }')
+      end.to raise_error(Resolver::Error, /ya existe en este scope/)
+    end
+
     it 'rechaza leer una variable local en su propio inicializador' do
       expect do
         resolve_source('{ var a = a; }')

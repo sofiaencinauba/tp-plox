@@ -130,7 +130,11 @@ class Resolver
 	def declare(name)
 		return if @scopes.empty?
 
-		raise Error, "La variable '#{name}' ya existe en este scope." if @scopes.last.key?(name)
+		# Las variables globales si pueden ser redefinidas/redeclaradas en Lox
+		# Por eso el @scopes.length > 1
+		if @scopes.length > 1 && @scopes.last.key?(name)
+			raise Error, "La variable '#{name}' ya existe en este scope."
+		end
 
 		@scopes.last[name] = :declared
 	end
