@@ -38,14 +38,13 @@ class Rlox
       return
     end
 
-    # if @mode == :resolve
-    #   resolver = Resolver.new(@interpreter)
-    #   resolver.resolve(program)
-    #   puts "Resolución completada con éxito."
-    #   return
-    # end
+    if @mode == :resolve
+      @resolver.resolve(program)
+      puts "Resolución completada con éxito."
+      return
+    end
 
-    resolver.resolve(program)
+    @resolver.resolve(program)
 
     result = @interpreter.interpret(program)
     puts result if display_result && program.statements.last.is_a?(AST::ExpressionStatement)
@@ -70,8 +69,8 @@ class Rlox
 
     modes = {
       '--scanning' => :scanning,
-      '--parsing' => :parsing
-      # '--resolve' => :resolve #WIP
+      '--parsing' => :parsing,
+      '--resolve' => :resolve
     }
 
     selected_modes = modes.keys & args
