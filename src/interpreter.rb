@@ -10,6 +10,7 @@ class Interpreter
 
   def initialize(environment = Env.new)
     @environment = environment
+    @locals = {}
   end
 
   def interpret(node)
@@ -20,6 +21,10 @@ class Interpreter
     else
       evaluate(node)
     end
+  end
+
+  def resolve(node, depth)
+    @locals[node.object_id] = depth
   end
 
   private
@@ -91,7 +96,15 @@ class Interpreter
     when AST::Literal
       expr.value
     when AST::Variable
-      @environment.get(expr.name)
+      distance = @locals[expr.object_id]
+      raise Error, "Variable '#{expr.name}' no definida." unless distance
+      @environment.get_at(distance, expr.name)
+
+    when AST::Assignment
+      distance = @locals[expr.object_id]
+      raise Error, "Variable '#{expr.name}' no definida." unless distance
+      @environment.assign_at(distance, expr.name, evaluate(expr.value))
+
     when AST::Grouping
       evaluate(expr.expression)
     when AST::Unary
@@ -109,9 +122,6 @@ class Interpreter
       else
         raise Error, "Se encontró un operador lógico desconocido: #{expr.operator.token_type}"
       end
-    when AST::Assignment
-      value = evaluate(expr.value)
-      @environment.assign(expr.name, value)
     when AST::Call
       callee = evaluate(expr.callee)
       arguments = expr.arguments.map { |arg| evaluate(arg) }

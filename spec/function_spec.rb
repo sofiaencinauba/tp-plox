@@ -41,7 +41,7 @@ RSpec.describe Function do
 
     expect(function.call(interpreter, [2.0])).to eq(:result)
     expect(captured_environment.get('a')).to eq(2.0)
-    expect(captured_environment.get('externa')).to eq(10.0)
+    expect(captured_environment.get_at(1, 'externa')).to eq(10.0)
   end
 
   it 'rechaza una cantidad incorrecta de argumentos' do

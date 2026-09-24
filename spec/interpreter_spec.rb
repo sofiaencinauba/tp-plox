@@ -2,15 +2,24 @@ require 'spec_helper'
 require_relative '../src/scanner'
 require_relative '../src/parser'
 require_relative '../src/interpreter'
+require_relative '../src/resolver'
 
 RSpec.describe Interpreter do
+  let(:interpreter) { described_class.new }
+  let(:resolver) { Resolver.new(interpreter) }
+
   def parse_program(source)
     Parser.new(Scanner.new(source).scan).parse
   end
 
+  def run_program(program, interpreter:, resolver:)
+    resolver.resolve(program)
+    interpreter.interpret(program)
+  end
+
   def interpret(source)
     program = parse_program(source)
-    result = described_class.new.interpret(program)
+    result = run_program(program, interpreter: interpreter, resolver: resolver)
     puts result if program.statements.last.is_a?(AST::ExpressionStatement)
   end
 
@@ -22,7 +31,7 @@ RSpec.describe Interpreter do
     environment = Env.new
     interpreter = described_class.new(environment)
 
-    expect { interpreter.interpret(parse_program('var a = 1;')) }.not_to output.to_stdout
+    expect { run_program(parse_program('var a = 1;'), interpreter: interpreter, resolver: Resolver.new(interpreter)) }.not_to output.to_stdout
     expect(environment.get('a')).to eq(1.0)
   end
 
@@ -30,7 +39,7 @@ RSpec.describe Interpreter do
     environment = Env.new
     interpreter = described_class.new(environment)
 
-    interpreter.interpret(parse_program('var a;'))
+    run_program(parse_program('var a;'), interpreter: interpreter, resolver: Resolver.new(interpreter))
 
     expect(environment.get('a')).to be_nil
   end
@@ -41,10 +50,12 @@ RSpec.describe Interpreter do
 
   it 'lee una variable de un programa anterior con el mismo intérprete' do
     interpreter = described_class.new
+    resolver = Resolver.new(interpreter)
 
-    interpreter.interpret(parse_program('var a = 1;'))
+    run_program(parse_program('var a = 1;'), interpreter: interpreter, resolver: resolver)
 
-    expect { interpreter.interpret(parse_program('print a;')) }.to output("1.0\n").to_stdout
+    expect { run_program(parse_program('print a;'), interpreter: interpreter, resolver: resolver) }
+      .to output("1.0\n").to_stdout
   end
 
   describe 'scopes de bloques' do
@@ -73,11 +84,14 @@ RSpec.describe Interpreter do
 
     it 'restaura el entorno anterior aunque una instrucción del bloque falle' do
       interpreter = described_class.new
-      interpreter.interpret(parse_program('var a = "global";'))
+      resolver = Resolver.new(interpreter)
+      run_program(parse_program('var a = "global";'), interpreter: interpreter, resolver: resolver)
 
-      expect { interpreter.interpret(parse_program('{ var a = "local"; print desconocida; };')) }
-        .to raise_error(Env::Error, "Variable 'desconocida' no definida.")
-      expect { interpreter.interpret(parse_program('print a;')) }.to output("global\n").to_stdout
+      expect do
+        run_program(parse_program('{ var a = "local"; print desconocida; };'), interpreter: interpreter, resolver: resolver)
+      end.to raise_error(Env::Error, "Variable 'desconocida' no definida.")
+      expect { run_program(parse_program('print a;'), interpreter: interpreter, resolver: resolver) }
+        .to output("global\n").to_stdout
     end
   end
 
@@ -203,8 +217,9 @@ RSpec.describe Interpreter do
     it 'asigna un valor a una variable existente' do
       environment = Env.new
       interpreter = described_class.new(environment)
-      interpreter.interpret(parse_program('var a = 1;'))
-      interpreter.interpret(parse_program('a = 2;'))
+      resolver = Resolver.new(interpreter)
+      run_program(parse_program('var a = 1;'), interpreter: interpreter, resolver: resolver)
+      run_program(parse_program('a = 2;'), interpreter: interpreter, resolver: resolver)
 
       expect(environment.get('a')).to eq(2.0)
     end
@@ -235,7 +250,7 @@ RSpec.describe Interpreter do
       interpreter = described_class.new(environment)
       source = 'fun saludar() { print desconocida; };'
 
-      expect { interpreter.interpret(parse_program(source)) }.not_to raise_error
+      expect { run_program(parse_program(source), interpreter: interpreter, resolver: Resolver.new(interpreter)) }.not_to raise_error
       expect(environment.get('saludar')).to be_a(Function)
     end
 
@@ -243,7 +258,9 @@ RSpec.describe Interpreter do
       source = 'fun prueba(x) { print x; }; prueba(2);'
       interpreter = described_class.new
 
-      expect { interpreter.interpret(parse_program(source)) }.to output("2.0\n").to_stdout
+      resolver = Resolver.new(interpreter)
+      expect { run_program(parse_program(source), interpreter: interpreter, resolver: resolver) }
+        .to output("2.0\n").to_stdout
     end
 
     it 'rechaza llamar a un valor que no es una función' do

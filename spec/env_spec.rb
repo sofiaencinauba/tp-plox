@@ -41,16 +41,16 @@ RSpec.describe Env do
     let(:parent) { described_class.new }
     let(:child) { described_class.new(parent) }
 
-    it 'obtiene una variable del entorno padre' do
+    it 'obtiene una variable del entorno padre mediante su distancia' do
       parent.define('global', 1)
 
-      expect(child.get('global')).to eq(1)
+      expect(child.get_at(1, 'global')).to eq(1)
     end
 
-    it 'asigna una variable existente del entorno padre' do
+    it 'asigna una variable existente del entorno padre mediante su distancia' do
       parent.define('global', 1)
 
-      child.assign('global', 2)
+      child.assign_at(1, 'global', 2)
 
       expect(parent.get('global')).to eq(2)
     end

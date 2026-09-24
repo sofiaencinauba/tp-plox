@@ -3,7 +3,8 @@ require_relative 'ast_node'
 
 class Env
   class Error < StandardError; end
-
+  
+  attr_reader :enclosing
   def initialize(enclosing = nil)
     @values = {}
     @enclosing = enclosing
@@ -13,21 +14,48 @@ class Env
     @values[name] = value
   end
 
+  # def get(name)
+  #   return @values[name] if @values.key?(name)
+  #   return @enclosing.get(name) if @enclosing
+
+  #   raise Error, "Variable '#{name}' no definida."
+  # end
+
+  # def assign(name, value)
+  #   if @values.key?(name)
+  #     @values[name] = value
+  #     return value
+  #   end
+
+  #   return @enclosing.assign(name, value) if @enclosing
+
+  #   raise Error, "Variable '#{name}' no definida."
+  # end
+
+  def ancestor(distance)
+    environment = self
+    distance.times { environment = environment.enclosing }
+    environment
+  end
+
+  def get_at(distance, name)
+    ancestor(distance).get(name)
+  end
+
+  def assign_at(distance, name, value)
+    ancestor(distance).assign(name, value)
+  end
+
   def get(name)
     return @values[name] if @values.key?(name)
-    return @enclosing.get(name) if @enclosing
 
     raise Error, "Variable '#{name}' no definida."
   end
 
   def assign(name, value)
-    if @values.key?(name)
-      @values[name] = value
-      return value
-    end
+    raise Error, "Variable '#{name}' no definida." unless @values.key?(name)
 
-    return @enclosing.assign(name, value) if @enclosing
-
-    raise Error, "Variable '#{name}' no definida."
+    @values[name] = value
   end
+
 end

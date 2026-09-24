@@ -4,10 +4,13 @@ require_relative '../src/parser'
 require_relative '../src/resolver'
 
 RSpec.describe Resolver do
+  let(:interpreter) { spy('interpreter') }
+  let(:resolver) { described_class.new(interpreter) }
+
   def resolve_source(source)
     program = Parser.new(Scanner.new(source).scan).parse
 
-    described_class.new(nil).resolve(program)
+    resolver.resolve(program)
   end
 
   describe '#resolve' do
@@ -15,6 +18,15 @@ RSpec.describe Resolver do
       expect do
         resolve_source('var a = "global"; { var b = a; };')
       end.not_to raise_error
+    end
+
+    it 'registra la distancia de una variable en un scope exterior' do
+      program = Parser.new(Scanner.new('var a = 1; { print a; };').scan).parse
+      reference = program.statements[1].statements.first.expression
+
+      resolver.resolve(program)
+
+      expect(interpreter).to have_received(:resolve).with(reference, 1)
     end
 
     it 'rechaza leer una variable local en su propio inicializador' do

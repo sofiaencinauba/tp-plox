@@ -3,8 +3,9 @@
 class Resolver
   class Error < StandardError; end
 
-  def initialize(_interpreter)
-    @scopes = []
+  def initialize(interpreter)
+    @scopes = [{}]
+		@interpreter = interpreter
   end
 
 	def resolve(node)
@@ -75,7 +76,7 @@ class Resolver
 				declare(param.lexeme)
 				define(param.lexeme)
 			end
-			resolve(node.body)
+			node.body.statements.each { |statement| resolve(statement) }
 		ensure
 			end_scope
 		end
@@ -109,9 +110,10 @@ class Resolver
 		@scopes.reverse_each.with_index do |scope, distance|
 			next unless scope.key?(name)
 
-			@interpreter.resolve(node, distance)
-			return
+			return @interpreter.resolve(node, distance)
 		end
+		
+		@interpreter.resolve(node, @scopes.length - 1)
 	end
 
 	def begin_scope

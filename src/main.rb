@@ -14,6 +14,7 @@ class Rlox
     @mode = nil
     @debug = false
     @interpreter = Interpreter.new
+    @resolver = Resolver.new(@interpreter)
   end
 
   def run(source, display_result: false)
@@ -44,7 +45,6 @@ class Rlox
     #   return
     # end
 
-    resolver = Resolver.new(@interpreter)
     resolver.resolve(program)
 
     result = @interpreter.interpret(program)
@@ -56,6 +56,10 @@ class Rlox
     report_error('Parsing', e)
   rescue Interpreter::Error => e
     report_error('Runtime', e)
+  rescue Resolver::Error => e
+    report_error('Resolver', e)
+  rescue Env::Error => e
+    report_error('Environment', e)
   end
 
   def main
