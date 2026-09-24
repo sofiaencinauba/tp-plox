@@ -23,6 +23,7 @@ class Resolver
 
 		when AST::Assignment
 			resolve(node.value)
+			resolve_local(node, node.name)
 
 		when AST::ExpressionStatement
 			resolve(node.expression)
@@ -50,6 +51,35 @@ class Resolver
 		when AST::PrintStatement
 			resolve(node.expression)
 
+		when AST::Binary, AST::Logical
+			resolve(node.left)
+			resolve(node.right)
+
+		when AST::Unary
+			resolve(node.right)
+
+		when AST::Grouping
+			resolve(node.expression)
+
+		when AST::Call
+			resolve(node.callee)
+			node.arguments.each { |arg| resolve(arg) }
+
+		when AST::FunctionDeclaration
+			declare(node.name.lexeme)
+			define(node.name.lexeme)
+
+		begin
+			begin_scope
+			node.params.each do |param|
+				declare(param.lexeme)
+				define(param.lexeme)
+			end
+			resolve(node.body)
+		ensure
+			end_scope
+		end
+
 		end
 	end
 
@@ -71,6 +101,16 @@ class Resolver
 	def resolve_variable(expression)
 		if !@scopes.empty? && @scopes.last[expression.name] == :declared
 			raise Error, "No se puede leer '#{expression.name}' en su propio inicializador."
+		end
+		resolve_local(expression, expression.name)
+	end
+
+	def resolve_local(node, name)
+		@scopes.reverse_each.with_index do |scope, distance|
+			next unless scope.key?(name)
+
+			@interpreter.resolve(node, distance)
+			return
 		end
 	end
 
