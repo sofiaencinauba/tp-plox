@@ -14,20 +14,6 @@ class AST
     end
   end
 
-  class FunctionDeclaration < Statement
-    attr_reader :name, :params, :body
-
-    def initialize(name, params, body)
-      @name = name
-      @params = params
-      @body = body
-    end
-
-    def to_s
-      "FunctionDeclaration: #{@name}(#{@params.join(', ')}) { #{@body} }"
-    end
-  end
-
   class ExpressionStatement < Statement
     attr_reader :expression
 
