@@ -4,6 +4,7 @@ require_relative 'scanner'
 require_relative 'parser'
 require_relative 'resolver'
 require_relative 'interpreter'
+require_relative 'terminal_colors'
 
 class Rlox
   HISTORY_FILE = File.join(Dir.home, '.rlox_history')
@@ -23,7 +24,7 @@ class Rlox
 
     if @mode == :scanning
       tokens.each do |token|
-        puts token.inspect unless token.nil?
+        puts TerminalColors.colorize(token.inspect, :cyan) unless token.nil?
       end
       return
     end
@@ -33,14 +34,14 @@ class Rlox
 
     if @mode == :parsing
       program.statements.each do |statement|
-        puts statement.inspect
+        puts TerminalColors.colorize(statement.inspect, :cyan)
       end
       return
     end
 
     if @mode == :resolve
       @resolver.resolve(program)
-      puts "Resolución completada con éxito."
+      puts TerminalColors.colorize("Resolución completada con éxito.", :green)
       return
     end
 
@@ -103,11 +104,13 @@ class Rlox
   private
 
   def report_error(phase, error)
-    warn "#{phase} Error: #{error.message}"
+    message = "#{phase} Error: #{error.message}"
+
+    warn TerminalColors.colorize(message, :red, io: $stderr)
 
     return unless @debug
 
-    warn error.full_message(highlight: true)
+    warn error.full_message(highlight: $stderr.tty?)
   end
 
   def run_file(path, line_by_line: false)
