@@ -16,11 +16,13 @@ class Parser
     until at_end?
       statements << statement
 
-      unless check(TokenType::SEMICOLON)
-        raise Error, "Se esperaba ';' después de la instrucción, se encontró #{peek.inspect}."
+      if at_end?
+        raise Error, "Se esperaba ';' después de la instrucción, se encontró #{peek.inspect}." if statement_requires_semicolon?(statements.last)
+
+        break
       end
 
-      advance
+      consume_statement_terminator
     end
 
     AST::Program.new(statements)
@@ -67,7 +69,7 @@ class Parser
   end
 
   def return_statement
-    return AST::ReturnStatement.new(nil) if check(TokenType::SEMICOLON)
+    return AST::ReturnStatement.new(nil) if check(TokenType::SEMICOLON) || check(TokenType::RIGHT_BRACE) || check(TokenType::ELSE)
     raise Error, 'Se esperaba una expresión después de return.' if at_end?
 
     AST::ReturnStatement.new(expression)
@@ -100,11 +102,9 @@ class Parser
 
     until at_end? || check(TokenType::RIGHT_BRACE)
       statements << statement
-      unless check(TokenType::SEMICOLON)
-        raise Error, "Se esperaba ';' después de la instrucción, se encontró #{peek.inspect}."
-      end
+      break if at_end? || check(TokenType::RIGHT_BRACE)
 
-      advance
+      consume_statement_terminator
     end
 
     unless check(TokenType::RIGHT_BRACE)
@@ -416,6 +416,24 @@ class Parser
 
   def at_end?
     peek.token_type == TokenType::EOF
+  end
+
+  def consume_statement_terminator
+    if check(TokenType::SEMICOLON)
+      advance
+    elsif check(TokenType::RIGHT_BRACE) || check(TokenType::ELSE)
+      nil
+    else
+      raise Error, "Se esperaba ';' después de la instrucción, se encontró #{peek.inspect}."
+    end
+  end
+
+  def statement_requires_semicolon?(statement_node)
+    !statement_node.is_a?(AST::BlockStatement) &&
+      !statement_node.is_a?(AST::IfStatement) &&
+      !statement_node.is_a?(AST::WhileStatement) &&
+      !statement_node.is_a?(AST::ForStatement) &&
+      !statement_node.is_a?(AST::FunctionDeclaration)
   end
 
   def check(*types)

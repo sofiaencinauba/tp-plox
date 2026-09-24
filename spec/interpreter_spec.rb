@@ -122,6 +122,10 @@ RSpec.describe Interpreter do
     it 'ejecuta un bloque como rama then' do
       expect { interpret('if (true) { var a = 1; print a; };') }.to output("1.0\n").to_stdout
     end
+
+    it 'acepta un bloque sin punto y coma final' do
+      expect { interpret('if (true) { print "ok"; }') }.to output("ok\n").to_stdout
+    end
   end
 
   it 'respeta la precedencia entre suma y multiplicación' do

@@ -24,9 +24,13 @@ RSpec.describe Parser do
       )
     end
 
-    it 'requiere punto y coma al final de cada instrucción' do
+    it 'requiere punto y coma al final de una instrucción libre' do
       expect { parse_program('print 1') }.to raise_error(Parser::Error, /Se esperaba ';'/)
       expect { parse_program('1 print 2;') }.to raise_error(Parser::Error, /Se esperaba ';'/)
+    end
+
+    it 'permite omitir el punto y coma antes de cerrar un bloque o una rama else' do
+      expect { parse_program('if (true) { print "ok" }') }.not_to raise_error
     end
   end
 
