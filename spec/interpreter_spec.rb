@@ -60,26 +60,26 @@ RSpec.describe Interpreter do
 
   describe 'scopes de bloques' do
     it 'lee variables declaradas en el entorno exterior' do
-      expect { interpret('var a = 1; { print a; };') }.to output("1.0\n").to_stdout
+      expect { interpret('var a = 1; { print a; }') }.to output("1.0\n").to_stdout
     end
 
     it 'lee variables declaradas en el entorno exterior con doble llave' do
-      expect { interpret('var a = 1; {{ print a; }; };') }.to output("1.0\n").to_stdout
+      expect { interpret('var a = 1; {{ print a; } }') }.to output("1.0\n").to_stdout
     end
 
     it 'permite sombrear una variable sin cambiar su valor exterior' do
-      source = 'var a = "global"; { var a = "local"; print a; }; print a;'
+      source = 'var a = "global"; { var a = "local"; print a; } print a;'
 
       expect { interpret(source) }.to output("local\nglobal\n").to_stdout
     end
 
     it 'no deja acceder desde fuera a una variable local' do
-      expect { interpret('{ var a = 1; }; print a;') }
+      expect { interpret('{ var a = 1; } print a;') }
         .to raise_error(Env::Error, "Variable 'a' no definida.")
     end
 
     it 'permite que un bloque anidado lea una variable de su bloque padre' do
-      expect { interpret('{ var a = 1; { print a; }; };') }.to output("1.0\n").to_stdout
+      expect { interpret('{ var a = 1; { print a; } }') }.to output("1.0\n").to_stdout
     end
 
     it 'restaura el entorno anterior aunque una instrucción del bloque falle' do
@@ -88,7 +88,7 @@ RSpec.describe Interpreter do
       run_program(parse_program('var a = "global";'), interpreter: interpreter, resolver: resolver)
 
       expect do
-        run_program(parse_program('{ var a = "local"; print desconocida; };'), interpreter: interpreter, resolver: resolver)
+        run_program(parse_program('{ var a = "local"; print desconocida; }'), interpreter: interpreter, resolver: resolver)
       end.to raise_error(Env::Error, "Variable 'desconocida' no definida.")
       expect { run_program(parse_program('print a;'), interpreter: interpreter, resolver: resolver) }
         .to output("global\n").to_stdout
@@ -105,22 +105,22 @@ RSpec.describe Interpreter do
     end
 
     it 'ejecuta la rama else cuando la condición es falsa' do
-      expect { interpret('if (false) print "then" else print "else";') }.to output("else\n").to_stdout
+      expect { interpret('if (false) print "then"; else print "else";') }.to output("else\n").to_stdout
     end
 
     it 'considera nil falso y otros valores verdaderos' do
-      source = 'if (nil) print "then" else print "else"; if (0) print "numero";'
+      source = 'if (nil) print "then"; else print "else"; if (0) print "numero";'
 
       expect { interpret(source) }.to output("else\nnumero\n").to_stdout
     end
 
     it 'evalúa solamente la rama elegida' do
-      expect { interpret('if (true) print "ok" else print desconocida;') }.to output("ok\n").to_stdout
-      expect { interpret('if (false) print desconocida else print "ok";') }.to output("ok\n").to_stdout
+      expect { interpret('if (true) print "ok"; else print desconocida;') }.to output("ok\n").to_stdout
+      expect { interpret('if (false) print desconocida; else print "ok";') }.to output("ok\n").to_stdout
     end
 
     it 'ejecuta un bloque como rama then' do
-      expect { interpret('if (true) { var a = 1; print a; };') }.to output("1.0\n").to_stdout
+      expect { interpret('if (true) { var a = 1; print a; }') }.to output("1.0\n").to_stdout
     end
 
     it 'acepta un bloque sin punto y coma final' do
@@ -241,7 +241,7 @@ RSpec.describe Interpreter do
     end
 
     it 'no permite acceder fuera del for a su variable local' do
-      source = 'for (var i = 0; i < 1; i = i + 1) { }; print i;'
+      source = 'for (var i = 0; i < 1; i = i + 1) { } print i;'
 
       expect { interpret(source) }
         .to raise_error(Env::Error, "Variable 'i' no definida.")
@@ -252,14 +252,14 @@ RSpec.describe Interpreter do
     it 'registra una función en el entorno sin ejecutar su cuerpo' do
       environment = Env.new
       interpreter = described_class.new(environment)
-      source = 'fun saludar() { print desconocida; };'
+      source = 'fun saludar() { print desconocida; }'
 
       expect { run_program(parse_program(source), interpreter: interpreter, resolver: Resolver.new(interpreter)) }.not_to raise_error
       expect(environment.get('saludar')).to be_a(Function)
     end
 
     it 'ejecuta una función con el argumento recibido' do
-      source = 'fun prueba(x) { print x; }; prueba(2);'
+      source = 'fun prueba(x) { print x; } prueba(2);'
       interpreter = described_class.new
 
       resolver = Resolver.new(interpreter)
@@ -268,13 +268,13 @@ RSpec.describe Interpreter do
     end
 
     it 'retorna un valor desde una función' do
-      source = 'fun sumar(a, b) { return a + b; }; print sumar(2, 3);'
+      source = 'fun sumar(a, b) { return a + b; } print sumar(2, 3);'
 
       expect { interpret(source) }.to output("5.0\n").to_stdout
     end
 
     it 'sale temprano al encontrar un return' do
-      source = 'fun prueba() { print "antes"; return; print "despues"; }; prueba();'
+      source = 'fun prueba() { print "antes"; return; print "despues"; } prueba();'
 
       expect { interpret(source) }.to output("antes\n\n").to_stdout
     end

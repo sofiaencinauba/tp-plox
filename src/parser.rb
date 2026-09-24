@@ -13,16 +13,11 @@ class Parser
 
   def parse
     statements = []
+
     until at_end?
-      statements << statement
-
-      if at_end?
-        raise Error, "Se esperaba ';' después de la instrucción, se encontró #{peek.inspect}." if statement_requires_semicolon?(statements.last)
-
-        break
-      end
-
-      consume_statement_terminator
+      statement_node = statement
+      statements << statement_node
+      consume_terminator_if_required(statement_node)
     end
 
     AST::Program.new(statements)
@@ -69,7 +64,8 @@ class Parser
   end
 
   def return_statement
-    return AST::ReturnStatement.new(nil) if check(TokenType::SEMICOLON) || check(TokenType::RIGHT_BRACE) || check(TokenType::ELSE)
+    return AST::ReturnStatement.new(nil) if check(TokenType::SEMICOLON)
+
     raise Error, 'Se esperaba una expresión después de return.' if at_end?
 
     AST::ReturnStatement.new(expression)
@@ -101,10 +97,9 @@ class Parser
     statements = []
 
     until at_end? || check(TokenType::RIGHT_BRACE)
-      statements << statement
-      break if at_end? || check(TokenType::RIGHT_BRACE)
-
-      consume_statement_terminator
+      statement_node = statement
+      statements << statement_node
+      consume_terminator_if_required(statement_node)
     end
 
     unless check(TokenType::RIGHT_BRACE)
@@ -129,10 +124,12 @@ class Parser
     advance
 
     then_branch = statement
+    consume_terminator_if_required(then_branch)
 
     if check(TokenType::ELSE)
       advance
       else_branch = statement
+      consume_terminator_if_required(else_branch)
     else
       else_branch = nil
     end
@@ -154,6 +151,7 @@ class Parser
     advance
 
     body = statement
+    consume_terminator_if_required(body)
 
     AST::WhileStatement.new(condition, body)
   end
@@ -163,7 +161,6 @@ class Parser
 
     advance
 
-    # TODO: Falta handlear cuando se utiliza una variable declarada fuera del for
     initializer = nil
     unless check(TokenType::SEMICOLON)
       initializer = if check(TokenType::VAR)
@@ -199,6 +196,7 @@ class Parser
     advance
 
     body = statement
+    consume_terminator_if_required(body)
 
     AST::ForStatement.new(initializer, condition, increment, body)
   end
@@ -418,22 +416,22 @@ class Parser
     peek.token_type == TokenType::EOF
   end
 
-  def consume_statement_terminator
-    if check(TokenType::SEMICOLON)
-      advance
-    elsif check(TokenType::RIGHT_BRACE) || check(TokenType::ELSE)
-      nil
-    else
-      raise Error, "Se esperaba ';' después de la instrucción, se encontró #{peek.inspect}."
-    end
-  end
-
   def statement_requires_semicolon?(statement_node)
     !statement_node.is_a?(AST::BlockStatement) &&
       !statement_node.is_a?(AST::IfStatement) &&
       !statement_node.is_a?(AST::WhileStatement) &&
       !statement_node.is_a?(AST::ForStatement) &&
       !statement_node.is_a?(AST::FunctionDeclaration)
+  end
+
+  def consume_terminator_if_required(statement)
+    return unless statement_requires_semicolon?(statement)
+
+    unless check(TokenType::SEMICOLON)
+      raise Error, "Se esperaba ';' después de la instrucción, se encontró #{peek.inspect}."
+    end
+
+    advance
   end
 
   def check(*types)

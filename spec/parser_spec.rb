@@ -29,8 +29,8 @@ RSpec.describe Parser do
       expect { parse_program('1 print 2;') }.to raise_error(Parser::Error, /Se esperaba ';'/)
     end
 
-    it 'permite omitir el punto y coma antes de cerrar un bloque o una rama else' do
-      expect { parse_program('if (true) { print "ok" }') }.not_to raise_error
+    it 'requiere punto y coma para una instrucción dentro de un bloque' do
+      expect { parse_program('if (true) { print "ok" }') }.to raise_error(Parser::Error, /Se esperaba ';'/)
     end
   end
 
@@ -75,7 +75,7 @@ RSpec.describe Parser do
 
   describe '#parse function declarations' do
     it 'parsea una función sin parámetros' do
-      declaration = parse_program('fun saludar() { print "hola"; };').statements.first
+      declaration = parse_program('fun saludar() { print "hola"; }').statements.first
 
       expect(declaration).to be_a(AST::FunctionDeclaration)
       expect(declaration.name.lexeme).to eq('saludar')
@@ -84,7 +84,7 @@ RSpec.describe Parser do
     end
 
     it 'parsea los parámetros de una función' do
-      declaration = parse_program('fun sumar(a, b) { print a + b; };').statements.first
+      declaration = parse_program('fun sumar(a, b) { print a + b; }').statements.first
 
       expect(declaration.params.map(&:lexeme)).to eq(%w[a b])
       expect(declaration.body.statements.first).to be_a(AST::PrintStatement)
@@ -103,14 +103,14 @@ RSpec.describe Parser do
     end
 
     it 'parsea las dos ramas' do
-      statement = parse_program('if (true) print "si" else print "no";').statements.first
+      statement = parse_program('if (true) print "si"; else print "no";').statements.first
 
       expect(statement.then_branch.expression).to eq(AST::Literal.new('si'))
       expect(statement.else_branch.expression).to eq(AST::Literal.new('no'))
     end
 
     it 'asocia else con el if más cercano' do
-      outer = parse_program('if (true) if (false) print 1 else print 2;').statements.first
+      outer = parse_program('if (true) if (false) print 1; else print 2;').statements.first
 
       expect(outer.else_branch).to be_nil
       expect(outer.then_branch).to be_a(AST::IfStatement)
