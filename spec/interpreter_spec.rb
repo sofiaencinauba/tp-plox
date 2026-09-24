@@ -263,6 +263,18 @@ RSpec.describe Interpreter do
         .to output("2.0\n").to_stdout
     end
 
+    it 'retorna un valor desde una función' do
+      source = 'fun sumar(a, b) { return a + b; }; print sumar(2, 3);'
+
+      expect { interpret(source) }.to output("5.0\n").to_stdout
+    end
+
+    it 'sale temprano al encontrar un return' do
+      source = 'fun prueba() { print "antes"; return; print "despues"; }; prueba();'
+
+      expect { interpret(source) }.to output("antes\n\n").to_stdout
+    end
+
     it 'rechaza llamar a un valor que no es una función' do
       expect { interpret('var numero = 1; numero();') }
         .to raise_error(Interpreter::Error, 'Sólo se pueden llamar funciones.')

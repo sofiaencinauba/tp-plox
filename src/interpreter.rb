@@ -38,6 +38,9 @@ class Interpreter
     when AST::PrintStatement
       puts evaluate(statement.expression)
       nil
+    when AST::ReturnStatement
+      value = statement.value.nil? ? nil : evaluate(statement.value)
+      raise ReturnValue.new(value)
     when AST::ExpressionStatement
       evaluate(statement.expression)
     when AST::BlockStatement

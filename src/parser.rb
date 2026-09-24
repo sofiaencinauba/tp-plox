@@ -36,6 +36,9 @@ class Parser
     when TokenType::PRINT
       advance
       print_statement
+    when TokenType::RETURN
+      advance
+      return_statement
     when TokenType::LEFT_BRACE
       advance
       block_statement
@@ -61,6 +64,13 @@ class Parser
 
     expr = expression
     AST::ExpressionStatement.new(expr)
+  end
+
+  def return_statement
+    return AST::ReturnStatement.new(nil) if check(TokenType::SEMICOLON)
+    raise Error, 'Se esperaba una expresión después de return.' if at_end?
+
+    AST::ReturnStatement.new(expression)
   end
 
   def var_declaration

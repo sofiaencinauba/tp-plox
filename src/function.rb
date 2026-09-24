@@ -1,5 +1,13 @@
 require_relative 'env'
 
+class ReturnValue < StandardError
+  attr_reader :value
+
+  def initialize(value)
+    @value = value
+  end
+end
+
 class Function
   def initialize(declaration, closure_environment)
     @declaration = declaration
@@ -17,6 +25,8 @@ class Function
       environment.define(param.lexeme, arguments[index])
     end
     interpreter.execute_block(@declaration.body.statements, environment)
+    rescue ReturnValue => e
+      return e.value
   end
 
   def arity

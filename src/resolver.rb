@@ -49,6 +49,9 @@ class Resolver
 			end_scope
 		end
 
+        when AST::ReturnStatement
+            resolve(node.value) if node.value
+
 		when AST::PrintStatement
 			resolve(node.expression)
 
