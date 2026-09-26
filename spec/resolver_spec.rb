@@ -35,6 +35,12 @@ RSpec.describe Resolver do
       expect { resolve_source('var a;') }.not_to raise_error
     end
 
+    it 'permite usar el valor global anterior al redeclarar una variable' do
+      expect do
+        resolve_source('var a = "old"; var a = a;')
+      end.not_to raise_error
+    end
+
     it 'rechaza redeclarar una variable dentro del mismo scope local' do
       expect do
         resolve_source('{ var a = 1; var a = 2; }')

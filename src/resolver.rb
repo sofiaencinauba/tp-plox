@@ -129,10 +129,10 @@ class Resolver
 
 	def declare(name)
 		return if @scopes.empty?
+		return if @scopes.length == 1
 
 		# Las variables globales si pueden ser redefinidas/redeclaradas en Lox
-		# Por eso el @scopes.length > 1
-		if @scopes.length > 1 && @scopes.last.key?(name)
+		if @scopes.last.key?(name)
 			raise Error, "La variable '#{name}' ya existe en este scope."
 		end
 
