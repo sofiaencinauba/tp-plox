@@ -273,6 +273,13 @@ RSpec.describe Interpreter do
       expect { interpret(source) }.to output("5.0\n").to_stdout
     end
 
+    it 'rechaza una cantidad incorrecta de argumentos con un error del intérprete' do
+      source = 'fun sumar(a, b) { return a + b; } sumar(1);'
+
+      expect { interpret(source) }
+        .to raise_error(Interpreter::Error, 'Se esperaban 2 argumentos, se recibieron 1.')
+    end
+
     it 'sale temprano al encontrar un return' do
       source = 'fun prueba() { print "antes"; return; print "despues"; } prueba();'
 

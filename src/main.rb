@@ -56,6 +56,8 @@ class Rlox
     report_error('Parsing', e)
   rescue Interpreter::Error => e
     report_error('Runtime', e)
+  rescue ArgumentError => e
+    report_error('Runtime', e)
   rescue Resolver::Error => e
     report_error('Resolver', e)
   rescue Env::Error => e

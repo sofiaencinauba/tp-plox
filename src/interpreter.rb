@@ -133,7 +133,11 @@ class Interpreter
         raise Error, 'Sólo se pueden llamar funciones.'
       end
 
-      callee.call(self, arguments)
+      begin
+        callee.call(self, arguments)
+      rescue ArgumentError => error
+        raise Error, error.message
+      end
     else
       raise Error, "Se encontró un tipo de expresión desconocido: #{expr.class}"
     end
