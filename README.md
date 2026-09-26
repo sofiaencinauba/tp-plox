@@ -34,6 +34,7 @@ Ya adentro:
 bundle exec rake            # linter + tests
 bundle exec rspec           # solo tests
 bundle exec rubocop -a      # linter con autocorrección
+bundle exec cucumber        # tests de integración
 ```
 
 ## Gemas nuevas
