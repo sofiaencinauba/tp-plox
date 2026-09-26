@@ -21,6 +21,8 @@ class Interpreter
     else
       evaluate(node)
     end
+  rescue ReturnValue
+    raise Error, 'No se puede usar return fuera de una función.'
   end
 
   def resolve(node, depth)

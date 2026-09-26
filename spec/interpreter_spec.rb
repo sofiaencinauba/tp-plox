@@ -141,6 +141,11 @@ RSpec.describe Interpreter do
       .to raise_error(Interpreter::Error, 'No se puede dividir por cero.')
   end
 
+  it 'rechaza return en el nivel superior como un error del intérprete' do
+    expect { interpret('return 1;') }
+      .to raise_error(Interpreter::Error, 'No se puede usar return fuera de una función.')
+  end
+
   it 'evalúa la negación aritmética' do
     expect { interpret('-5;') }.to output("-5.0\n").to_stdout
   end
