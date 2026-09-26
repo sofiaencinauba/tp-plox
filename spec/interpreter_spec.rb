@@ -202,10 +202,12 @@ RSpec.describe Interpreter do
       expect { interpret('true and false;') }.to output("false\n").to_stdout
     end
     it 'evalúa correctamente una expresión lógica AND con un valor nil' do
-      expect { interpret('true and nil;') }.to output("\n").to_stdout
+      expect { run_program(parse_program('true and nil;'), interpreter: interpreter, resolver: resolver) }
+        .not_to output.to_stdout
     end
     it 'evalúa correctamente una expresión lógica AND con un valor nil y un valor false' do
-      expect { interpret('nil and false;') }.to output("\n").to_stdout
+      expect { run_program(parse_program('nil and false;'), interpreter: interpreter, resolver: resolver) }
+        .not_to output.to_stdout
     end
     it 'evalúa correctamente una expresión lógica AND con un valor nil y un valor false' do
       expect { interpret('false and nil;') }.to output("false\n").to_stdout
@@ -217,7 +219,8 @@ RSpec.describe Interpreter do
       expect { interpret('false or true;') }.to output("true\n").to_stdout
     end
     it 'evalúa correctamente una expresión lógica OR con un valor nil y un valor false' do
-      expect { interpret('false or nil;') }.to output("\n").to_stdout
+      expect { run_program(parse_program('false or nil;'), interpreter: interpreter, resolver: resolver) }
+        .not_to output.to_stdout
     end
     it 'evalúa correctamente una expresión lógica OR con un valor nil y un valor true' do
       expect { interpret('nil or true;') }.to output("true\n").to_stdout

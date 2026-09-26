@@ -38,7 +38,7 @@ class Interpreter
       @environment.define(statement.name.lexeme, value)
       nil
     when AST::PrintStatement
-      puts evaluate(statement.expression)
+      puts printable(evaluate(statement.expression))
       nil
     when AST::ReturnStatement
       value = statement.value.nil? ? nil : evaluate(statement.value)
@@ -228,6 +228,10 @@ class Interpreter
   # Se hace asi y no directamente !right para que nil sea considerado falso
   def truthy?(value)
     value != false && !value.nil?
+  end
+
+  def printable(value)
+    value.nil? ? 'None' : value
   end
 
   def number?(*values)
