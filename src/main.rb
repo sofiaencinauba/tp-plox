@@ -26,7 +26,7 @@ class Rlox
       tokens.each do |token|
         puts TerminalColors.colorize(token.inspect, :cyan) unless token.nil?
       end
-      return
+      return tokens
     end
 
     parser = Parser.new(tokens)
