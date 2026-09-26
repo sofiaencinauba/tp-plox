@@ -225,9 +225,8 @@ class Interpreter
     end
   end
 
-  # Se hace asi y no directamente !right para que nil sea considerado falso
   def truthy?(value)
-    value != false && !value.nil?
+    !!value
   end
 
   def printable(value)

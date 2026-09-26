@@ -7,7 +7,9 @@ No hace falta instalar Ruby: todo corre dentro de un contenedor.
 
 ```text
 src/     código del intérprete (scanner, tokens)
-spec/    tests con RSpec
+spec/    tests unitarios con RSpec
+features/ tests de integración con Cucumber
+        /step_definitions  definición de los steps de Cucumber
 ```
 
 ## Primera vez
@@ -17,8 +19,7 @@ docker compose build
 docker compose run --rm ruby bundle install
 ```
 
-El `bundle install` se corre una sola vez: las gemas quedan en un volumen de
-Docker y sobreviven entre contenedores.
+El `bundle install` se corre una sola vez: las gemas quedan en un volumen de Docker y sobreviven entre contenedores.
 
 ## Uso
 
@@ -36,16 +37,6 @@ bundle exec rspec           # solo tests
 bundle exec rubocop -a      # linter con autocorrección
 bundle exec cucumber        # tests de integración
 ```
-
-## Gemas nuevas
-
-Agregala al `Gemfile` y, dentro del contenedor:
-
-```bash
-bundle install
-```
-
-No hace falta reconstruir la imagen.
 
 ## Explicacion del proyecto
 
@@ -78,8 +69,13 @@ primary        → NUMBER | STRING | "true" | "false" | "nil"
 Similar al Token, esta clase define las distintas expresiones aceptadas en el lenguaje con sus respectivos parametros (Por ejemplo, una comparacion tiene 2 operadores y 1 operando, mientras que un literal, que es la minima unidad de una expresion, tiene solo su valor).
 Tambien
 
-### ASTPrinter
+### Printer (ast_node.rb)
 ASTPrinter es una clase auxiliar utilizada para poder imprimir los nodos del arbol de una forma mas idiomatica, usado en el modo parser del interprete.
 
 ### Interprete
 El interprete se encarga de leer y evaluar las expresiones, recorriendo el AST y ejecutando los nodos. Empieza de la raiz, llegando recursivamente hasta los nodos hoja que tienen valores literales, y luego sube evaluando las expresiones resultantes, siempre respetando el orden de precedencia que se establecio en la creacion del arbol.
+
+# Diferencias principales con la implementación en Python
+- nil: al imprimir nil tuvimos que especificar que se matchee a None ya que Ruby por defecto imprimía un '\n'
+- truthy?: para chequear si un valor corresponde a verdadero simplemente lo negamos dos veces ya que plox mantiene la lógica de Ruby
+- 
