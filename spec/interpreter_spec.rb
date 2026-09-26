@@ -136,6 +136,11 @@ RSpec.describe Interpreter do
     expect { interpret('(1 + 2) * 3;') }.to output("9.0\n").to_stdout
   end
 
+  it 'rechaza la división por cero' do
+    expect { interpret('1 / 0;') }
+      .to raise_error(Interpreter::Error, 'No se puede dividir por cero.')
+  end
+
   it 'evalúa la negación aritmética' do
     expect { interpret('-5;') }.to output("-5.0\n").to_stdout
   end

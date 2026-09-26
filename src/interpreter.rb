@@ -187,6 +187,8 @@ class Interpreter
         raise Error, "Se esperaba que ambos operandos fueran números, se encontró #{left.class} y #{right.class}."
       end
 
+      raise Error, 'No se puede dividir por cero.' if right.zero?
+
       left / right
     when TokenType::EQUAL_EQUAL
       left == right
