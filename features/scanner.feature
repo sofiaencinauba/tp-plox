@@ -93,3 +93,12 @@ Feature: Scanner
       | Token Type | Lexeme          |
       | STRING     | "Hello, World!" |
       | SEMICOLON  | ;               |
+    
+    Rule: The scanner should fail gracefully on invalid input
+    Scenario: Tokenizing invalid input
+    Given the source code is:
+    """
+    @invalid_token;
+    """
+    When the scanner is run
+    Then an error should be raised indicating an invalid token was encountered

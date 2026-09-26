@@ -43,4 +43,70 @@ class AST
       @expression = expression
     end
   end
+
+  class Printer
+    def print(node)
+      case node
+      when AST::Literal
+        "<#{literal_value(node.value)}>"
+      when AST::Variable
+        "<#{node.name}>"
+      when AST::Grouping
+        "(#{print(node.expression)})"
+      when AST::Unary
+        "(#{operator_name(node.operator)} #{print(node.right)})"
+      when AST::Binary
+        "(#{print(node.left)} #{operator_name(node.operator)} #{print(node.right)})"
+      when AST::Logical
+        "(#{print(node.left)} #{operator_name(node.operator)} #{print(node.right)})"
+      when AST::Assignment
+        "#{node.name} #{node.operator.lexeme} #{print(node.value)}"
+      when AST::Call
+        "fn<#{print(node.callee)}(#{node.arguments.map { |argument| print(argument) }.join(', ')})>"
+      when AST::ExpressionStatement
+        print(node.expression)
+      when AST::Program
+        node.statements.map { |statement| print(statement) }.join('; ')
+      when AST::VarDeclaration
+        "VAR #{identifier_name(node.name)} = #{node.initializer ? print(node.initializer) : 'NIL'}"
+      when AST::PrintStatement
+        "PRINT #{print(node.expression)}"
+      when AST::BlockStatement
+        "{ #{node.statements.map { |statement| print(statement) }.join('; ')} }"
+      when AST::ReturnStatement
+        "RETURN #{print(node.value)}"
+      when AST::IfStatement
+        result = "IF #{print(node.condition)} THEN #{print(node.then_branch)}"
+        node.else_branch ? "#{result} ELSE #{print(node.else_branch)}" : result
+      when AST::WhileStatement
+        "WHILE #{print(node.condition)} #{print(node.body)}"
+      when AST::ForStatement
+          body = "{ #{print(node.body)}; #{print(node.increment)} }"
+          "{ #{print(node.initializer)}; WHILE #{print(node.condition)} #{body} }"
+      when AST::FunctionDeclaration
+        parameters = node.params.map { |parameter| identifier_name(parameter) }.join(', ')
+        "FUN fn<#{identifier_name(node.name)}(#{parameters})> #{print(node.body)}"
+      else
+        node.inspect
+      end
+    end
+
+    private
+
+    def operator_name(operator)
+      operator.token_type.to_s.upcase
+    end
+
+    def identifier_name(identifier)
+      identifier.respond_to?(:lexeme) ? identifier.lexeme : identifier
+    end
+
+    def literal_value(value)
+      return 'TRUE' if value == true
+      return 'FALSE' if value == false
+      return 'NIL' if value.nil?
+
+      value
+    end
+  end
 end

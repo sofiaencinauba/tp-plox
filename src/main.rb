@@ -33,10 +33,10 @@ class Rlox
     program = parser.parse
 
     if @mode == :parsing
-      program.statements.each do |statement|
-        puts TerminalColors.colorize(statement.inspect, :cyan)
-      end
-      return
+      printer = AST::Printer.new
+      result = program.statements.map { |statement| printer.print(statement) }
+      result.each { |statement| puts TerminalColors.colorize(statement, :cyan) }
+      return result.join("\n")
     end
 
     if @mode == :resolve
